@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { API_URL } from './api-config';
+import { environment } from '../environments/environment';
+
+const API_URL = environment.apiUrl;
 
 export interface Profesor {
   id: number;
