@@ -30,6 +30,11 @@ export const routes: Routes = [
         title: 'Grupos',
         loadComponent: () => import('./features/management/groups-section/groups-section').then((m) => m.GroupsSection),
       },
+      {
+        path: 'materias',
+        title: 'Materias',
+        loadComponent: () => import('./features/management/subjects-section/subjects-section').then((m) => m.SubjectsSection),
+      },
     ],
   },
   { path: '**', redirectTo: 'horario' },
