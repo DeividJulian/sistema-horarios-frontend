@@ -25,6 +25,8 @@ export class ScheduleGrid {
   readonly subjectsById = input.required<Map<number, Subject>>();
   readonly classroomsById = input.required<Map<number, Classroom>>();
   readonly filter = input.required<ScheduleFilter>();
+  /** Conflict descriptions per block id (from GET /conflictos). */
+  readonly conflicts = input<Map<number, string[]>>(new Map());
 
   readonly moved = output<EntryMove>();
   readonly occupiedDrop = output<void>();
@@ -57,6 +59,10 @@ export class ScheduleGrid {
 
   protected classroomName(entry: ScheduleEntry): string {
     return this.classroomsById().get(entry.aula_id)?.nombre ?? '—';
+  }
+
+  protected conflictsOf(entry: ScheduleEntry): string[] {
+    return this.conflicts().get(entry.id) ?? [];
   }
 
   protected color(entry: ScheduleEntry): string {

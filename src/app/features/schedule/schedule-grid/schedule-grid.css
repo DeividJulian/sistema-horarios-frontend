@@ -102,3 +102,27 @@
   color: var(--text-muted);
 }
 
+
+.block {
+  position: relative;
+}
+
+.block.has-conflict {
+  outline: 1px solid var(--danger);
+  background-color: rgba(251, 113, 133, 0.1);
+}
+
+.conflict-icon {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #1a0a0d;
+  background: var(--danger);
+}

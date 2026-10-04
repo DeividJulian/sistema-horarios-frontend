@@ -1,10 +1,14 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
+import { AnalysisService } from '../../../core/api/analysis.service';
+import { Conflict } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
 import { AnalysisResult } from '../../../workers/schedule-analysis';
 import { StateMessage } from '../../../shared/state-message/state-message';
+import { CONFLICT_LABELS } from '../../analysis/conflict-labels';
 import { AnalysisPanel } from '../analysis-panel/analysis-panel';
 import { EMPTY_FILTER, ScheduleFilter } from '../schedule-filter';
 import { ScheduleFilters } from '../schedule-filters/schedule-filters';
@@ -12,7 +16,7 @@ import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 
 @Component({
   selector: 'app-schedule-page',
-  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage],
+  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage, RouterLink],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
 })
@@ -20,9 +24,22 @@ export class SchedulePage {
   protected readonly store = inject(CatalogStore);
   private readonly notify = inject(NotificationService);
   private readonly confirm = inject(ConfirmService);
+  private readonly analysisApi = inject(AnalysisService);
 
   protected readonly filter = signal<ScheduleFilter>(EMPTY_FILTER);
   protected readonly analysis = signal<AnalysisResult | null>(null);
+  protected readonly conflicts = signal<Conflict[]>([]);
+
+  /** "Type: description" per block, so the calendar can flag the blocks in trouble. */
+  protected readonly conflictsByEntry = computed(() => {
+    const map = new Map<number, string[]>();
+    for (const c of this.conflicts()) {
+      for (const id of c.horario_ids) {
+        map.set(id, [...(map.get(id) ?? []), `${CONFLICT_LABELS[c.tipo]}: ${c.descripcion}`]);
+      }
+    }
+    return map;
+  });
 
   private readonly worker = this.createWorker();
 
@@ -66,7 +83,10 @@ export class SchedulePage {
 
   protected move({ entry, day, hour }: EntryMove): void {
     this.store.moveEntry(entry, day, hour).subscribe({
-      next: () => this.notify.success('Bloque movido.'),
+      next: () => {
+        this.notify.success('Bloque movido.');
+        this.refreshConflicts();
+      },
       error: (err) => this.notify.apiError(err, 'No se pudo mover el bloque.'),
     });
   }
@@ -77,7 +97,16 @@ export class SchedulePage {
 
   protected reload(): void {
     this.store.load().subscribe({
+      next: () => this.refreshConflicts(),
       error: (err) => this.notify.apiError(err, 'No se pudieron cargar los datos.'),
+    });
+  }
+
+  /** Conflicts are computed by the backend; a failure here is not critical, so it is silent. */
+  private refreshConflicts(): void {
+    this.analysisApi.conflicts().subscribe({
+      next: (report) => this.conflicts.set(report.conflictos),
+      error: () => this.conflicts.set([]),
     });
   }
 

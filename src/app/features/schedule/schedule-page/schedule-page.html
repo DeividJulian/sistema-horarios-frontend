@@ -33,6 +33,14 @@
     <app-analysis-panel [result]="result" />
   }
 
+  @if (conflictsByEntry().size > 0) {
+    <p class="conflict-summary" role="status">
+      <span class="conflict-dot" aria-hidden="true">!</span>
+      {{ conflictsByEntry().size }} {{ conflictsByEntry().size === 1 ? 'bloque tiene' : 'bloques tienen' }} conflictos (marcados en rojo).
+      <a routerLink="/analisis">Ver detalle</a>
+    </p>
+  }
+
   @if (store.entries().length === 0) {
     <app-state-message
       kind="empty"
@@ -48,6 +56,7 @@
     [subjectsById]="store.subjectsById()"
     [classroomsById]="store.classroomsById()"
     [filter]="filter()"
+    [conflicts]="conflictsByEntry()"
     (moved)="move($event)"
     (occupiedDrop)="occupiedDrop()"
   />
