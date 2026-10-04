@@ -1,14 +1,16 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, effect, inject, signal, untracked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
 import { HorarioService, Horario, Materia, Aula, Grupo, Profesor } from './horario.service';
 import { ResultadoAnalisis } from './analisis-horario.worker';
+import { EstadoConexion } from './estado-conexion';
+import { SincronizacionService } from './sincronizacion.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DragDropModule],
+  imports: [CommonModule, DragDropModule, EstadoConexion],
   template: `
     <div class="app">
       <header class="cabecera">
@@ -103,6 +105,8 @@ import { ResultadoAnalisis } from './analisis-horario.worker';
           </div>
         </div>
       </section>
+
+      <app-estado-conexion />
     </div>
   `,
   styles: [`
@@ -407,7 +411,16 @@ export class App implements OnInit {
 
   private paletaMaterias = ['#f5a623', '#2dd4bf', '#fb7185', '#38bdf8', '#a78bfa', '#a3e635'];
 
-  constructor(private horarioService: HorarioService) {}
+  private sincronizacion = inject(SincronizacionService);
+
+  constructor(private horarioService: HorarioService) {
+    // Cuando otra pestaña modifica el horario (aviso del Shared Worker), esta pestaña recarga los datos
+    effect(() => {
+      if (this.sincronizacion.cambiosRemotos() > 0) {
+        untracked(() => this.cargarDatos());
+      }
+    });
+  }
 
   ngOnInit(): void {
     for (const dia of this.dias) {
