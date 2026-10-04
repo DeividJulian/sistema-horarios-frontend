@@ -37,5 +37,10 @@ export const routes: Routes = [
       },
     ],
   },
+  {
+    path: 'analisis',
+    title: 'Análisis',
+    loadComponent: () => import('./features/analysis/analysis-page/analysis-page').then((m) => m.AnalysisPage),
+  },
   { path: '**', redirectTo: 'horario' },
 ];

@@ -1,3 +1,4 @@
+export * from './analysis';
 export * from './availability';
 export * from './classroom';
 export * from './schedule-entry';

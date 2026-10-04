@@ -16,5 +16,6 @@ export class NavBar {
   protected readonly items: NavItem[] = [
     { path: '/horario', label: 'Horario' },
     { path: '/gestion', label: 'Gestión' },
+    { path: '/analisis', label: 'Análisis' },
   ];
 }
