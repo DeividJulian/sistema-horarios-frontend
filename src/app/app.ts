@@ -106,8 +106,6 @@ import { ResultadoAnalisis } from './analisis-horario.worker';
     </div>
   `,
   styles: [`
-    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
-
     :host {
       --fondo: #12181f;
       --panel: #1c2530;
