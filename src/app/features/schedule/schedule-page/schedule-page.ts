@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 
+import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
 import { AnalysisResult } from '../../../workers/schedule-analysis';
@@ -17,6 +18,7 @@ import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 export class SchedulePage {
   protected readonly store = inject(CatalogStore);
   private readonly notify = inject(NotificationService);
+  private readonly confirm = inject(ConfirmService);
 
   protected readonly filter = signal<ScheduleFilter>(EMPTY_FILTER);
   protected readonly analysis = signal<AnalysisResult | null>(null);
@@ -28,7 +30,16 @@ export class SchedulePage {
     inject(DestroyRef).onDestroy(() => this.worker?.terminate());
   }
 
-  protected generate(): void {
+  protected async generate(): Promise<void> {
+    if (this.store.entries().length > 0) {
+      const accepted = await this.confirm.ask({
+        title: '¿Generar un horario nuevo?',
+        message: 'El horario actual se reemplazará por completo, incluidos los bloques que hayas movido a mano.',
+        confirmText: 'Generar horario',
+      });
+      if (!accepted) return;
+    }
+
     this.store.generateSchedule().subscribe({
       next: (result) => {
         this.notify.success(`Horario generado: ${result.total_bloques} bloques sin cruces.`);
