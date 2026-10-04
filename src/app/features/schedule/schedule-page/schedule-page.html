@@ -1,0 +1,32 @@
+<header class="page-header">
+  <div>
+    <p class="eyebrow">Panel de programación académica</p>
+    <h1>Sistema de Horarios y Aulas</h1>
+  </div>
+  <div class="actions">
+    <button type="button" class="btn-secondary" (click)="analyze()">Analizar horario</button>
+    <button type="button" class="btn-primary" (click)="generate()">Generar horario automáticamente</button>
+  </div>
+</header>
+
+<app-schedule-filters
+  [teachers]="store.teachers()"
+  [groups]="store.groups()"
+  [classrooms]="store.classrooms()"
+  [(filter)]="filter"
+/>
+
+@if (analysis(); as result) {
+  <app-analysis-panel [result]="result" />
+}
+
+<p class="hint muted">Arrastra un bloque a una casilla vacía para reprogramarlo.</p>
+
+<app-schedule-grid
+  [entries]="store.entries()"
+  [subjectsById]="store.subjectsById()"
+  [classroomsById]="store.classroomsById()"
+  [filter]="filter()"
+  (moved)="move($event)"
+  (occupiedDrop)="occupiedDrop()"
+/>

@@ -1,0 +1,37 @@
+<div class="grid-scroll">
+  <section class="board" cdkDropListGroup aria-label="Calendario semanal">
+    <div class="row header-row">
+      <div class="hour-cell"></div>
+      @for (day of weekdays; track day) {
+        <div class="day-cell">{{ day }}</div>
+      }
+    </div>
+
+    @for (hour of hours; track hour; let odd = $odd) {
+      <div class="row" [class.row-alt]="odd">
+        <div class="hour-cell">{{ hour }}:00</div>
+
+        @for (day of weekdays; track day) {
+          <div
+            class="cell"
+            cdkDropList
+            [id]="cellId(day, hour)"
+            [cdkDropListConnectedTo]="allCellIds"
+            [cdkDropListData]="entryAt(day, hour)"
+            (cdkDropListDropped)="onDrop($event, day, hour)"
+          >
+            @if (entryAt(day, hour); as entry) {
+              <div cdkDrag [cdkDragData]="entry" class="block" [style.borderLeftColor]="color(entry)">
+                <span class="block-dot" [style.backgroundColor]="color(entry)"></span>
+                <div class="block-text">
+                  <strong>{{ subjectName(entry) }}</strong>
+                  <span>{{ classroomName(entry) }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
