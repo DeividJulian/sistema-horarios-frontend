@@ -4,29 +4,51 @@
     <h1>Sistema de Horarios y Aulas</h1>
   </div>
   <div class="actions">
-    <button type="button" class="btn-secondary" (click)="analyze()">Analizar horario</button>
-    <button type="button" class="btn-primary" (click)="generate()">Generar horario automáticamente</button>
+    <button type="button" class="btn-secondary" (click)="analyze()" [disabled]="!store.loaded()">Analizar horario</button>
+    <button type="button" class="btn-primary" (click)="generate()" [disabled]="store.generating() || !store.loaded()">
+      {{ store.generating() ? 'Generando…' : 'Generar horario automáticamente' }}
+    </button>
   </div>
 </header>
 
-<app-schedule-filters
-  [teachers]="store.teachers()"
-  [groups]="store.groups()"
-  [classrooms]="store.classrooms()"
-  [(filter)]="filter"
-/>
+@if (store.loadError() && !store.loaded()) {
+  <app-state-message
+    kind="error"
+    title="No se pudo cargar el horario"
+    [message]="store.loadError()!"
+    actionText="Reintentar"
+    (action)="reload()"
+  />
+} @else if (!store.loaded()) {
+  <app-state-message kind="loading" title="Cargando horario…" message="Consultando profesores, aulas, grupos y materias." />
+} @else {
+  <app-schedule-filters
+    [teachers]="store.teachers()"
+    [groups]="store.groups()"
+    [classrooms]="store.classrooms()"
+    [(filter)]="filter"
+  />
 
-@if (analysis(); as result) {
-  <app-analysis-panel [result]="result" />
+  @if (analysis(); as result) {
+    <app-analysis-panel [result]="result" />
+  }
+
+  @if (store.entries().length === 0) {
+    <app-state-message
+      kind="empty"
+      title="Todavía no hay un horario"
+      message="Pulsa «Generar horario automáticamente» para que el algoritmo asigne todas las materias sin cruces."
+    />
+  } @else {
+    <p class="hint muted">Arrastra un bloque a una casilla vacía para reprogramarlo.</p>
+  }
+
+  <app-schedule-grid
+    [entries]="store.entries()"
+    [subjectsById]="store.subjectsById()"
+    [classroomsById]="store.classroomsById()"
+    [filter]="filter()"
+    (moved)="move($event)"
+    (occupiedDrop)="occupiedDrop()"
+  />
 }
-
-<p class="hint muted">Arrastra un bloque a una casilla vacía para reprogramarlo.</p>
-
-<app-schedule-grid
-  [entries]="store.entries()"
-  [subjectsById]="store.subjectsById()"
-  [classroomsById]="store.classroomsById()"
-  [filter]="filter()"
-  (moved)="move($event)"
-  (occupiedDrop)="occupiedDrop()"
-/>

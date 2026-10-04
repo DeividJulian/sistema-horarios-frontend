@@ -6,6 +6,7 @@ import { ScheduleService } from '../api/schedule.service';
 import { StudentGroupService } from '../api/student-group.service';
 import { SubjectService } from '../api/subject.service';
 import { TeacherService } from '../api/teacher.service';
+import { apiErrorMessage } from '../http/api-error';
 import {
   Classroom,
   GenerationResult,
@@ -39,6 +40,8 @@ export class CatalogStore {
 
   readonly loading = signal(false);
   readonly loaded = signal(false);
+  readonly loadError = signal<string | null>(null);
+  readonly generating = signal(false);
 
   readonly teachersById = computed(() => byId(this.teachers()));
   readonly classroomsById = computed(() => byId(this.classrooms()));
@@ -47,6 +50,7 @@ export class CatalogStore {
 
   load(): Observable<unknown> {
     this.loading.set(true);
+    this.loadError.set(null);
     return forkJoin({
       teachers: this.teacherApi.list(),
       classrooms: this.classroomApi.list(),
@@ -62,12 +66,14 @@ export class CatalogStore {
         this.entries.set(data.entries);
         this.loaded.set(true);
       }),
+      tap({ error: (err) => this.loadError.set(apiErrorMessage(err, 'No se pudieron cargar los datos.')) }),
       finalize(() => this.loading.set(false)),
     );
   }
 
   generateSchedule(): Observable<GenerationResult> {
-    return this.scheduleApi.generate();
+    this.generating.set(true);
+    return this.scheduleApi.generate().pipe(finalize(() => this.generating.set(false)));
   }
 
   /** Moves a block right away (optimistic update) and rolls back if the backend rejects it. */

@@ -4,6 +4,7 @@ import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
 import { AnalysisResult } from '../../../workers/schedule-analysis';
+import { StateMessage } from '../../../shared/state-message/state-message';
 import { AnalysisPanel } from '../analysis-panel/analysis-panel';
 import { EMPTY_FILTER, ScheduleFilter } from '../schedule-filter';
 import { ScheduleFilters } from '../schedule-filters/schedule-filters';
@@ -11,7 +12,7 @@ import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 
 @Component({
   selector: 'app-schedule-page',
-  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel],
+  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
 })
@@ -74,7 +75,7 @@ export class SchedulePage {
     this.notify.info('Esa casilla ya está ocupada. Elige una casilla vacía.');
   }
 
-  private reload(): void {
+  protected reload(): void {
     this.store.load().subscribe({
       error: (err) => this.notify.apiError(err, 'No se pudieron cargar los datos.'),
     });
