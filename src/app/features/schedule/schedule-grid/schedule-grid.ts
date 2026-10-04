@@ -30,6 +30,9 @@ export class ScheduleGrid {
 
   readonly moved = output<EntryMove>();
   readonly occupiedDrop = output<void>();
+  readonly selected = output<ScheduleEntry>();
+  /** Block highlighted because its details are open. */
+  readonly selectedId = input<number | null>(null);
 
   protected readonly weekdays = WEEKDAYS;
   protected readonly hours = START_HOURS;
@@ -63,6 +66,12 @@ export class ScheduleGrid {
 
   protected conflictsOf(entry: ScheduleEntry): string[] {
     return this.conflicts().get(entry.id) ?? [];
+  }
+
+  protected ariaLabel(entry: ScheduleEntry): string {
+    const hour = hourOf(entry.hora_inicio);
+    const problems = this.conflictsOf(entry).length ? ', con conflictos' : '';
+    return `${this.subjectName(entry)}, ${entry.dia_semana} ${hour}:00, ${this.classroomName(entry)}${problems}. Pulsa Enter para ver el detalle.`;
   }
 
   protected color(entry: ScheduleEntry): string {

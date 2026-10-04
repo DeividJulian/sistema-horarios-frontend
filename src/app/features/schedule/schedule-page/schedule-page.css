@@ -49,3 +49,15 @@ h1 {
   color: #1a0a0d;
   background: var(--danger);
 }
+
+.calendar-layout {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.calendar-layout app-schedule-grid {
+  min-width: 0;
+  max-width: 100%;
+}

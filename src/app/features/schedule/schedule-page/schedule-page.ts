@@ -2,7 +2,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AnalysisService } from '../../../core/api/analysis.service';
-import { Conflict } from '../../../core/models';
+import { Conflict, ScheduleEntry } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
@@ -12,11 +12,12 @@ import { CONFLICT_LABELS } from '../../analysis/conflict-labels';
 import { AnalysisPanel } from '../analysis-panel/analysis-panel';
 import { EMPTY_FILTER, ScheduleFilter } from '../schedule-filter';
 import { ScheduleFilters } from '../schedule-filters/schedule-filters';
+import { EntryDetails } from '../entry-details/entry-details';
 import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 
 @Component({
   selector: 'app-schedule-page',
-  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage, RouterLink],
+  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage, RouterLink, EntryDetails],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
 })
@@ -29,6 +30,10 @@ export class SchedulePage {
   protected readonly filter = signal<ScheduleFilter>(EMPTY_FILTER);
   protected readonly analysis = signal<AnalysisResult | null>(null);
   protected readonly conflicts = signal<Conflict[]>([]);
+  protected readonly selectedId = signal<number | null>(null);
+
+  /** Block whose details are open; it disappears if the block is deleted or the data reloads without it. */
+  protected readonly selectedEntry = computed(() => this.store.entries().find((e) => e.id === this.selectedId()) ?? null);
 
   /** "Type: description" per block, so the calendar can flag the blocks in trouble. */
   protected readonly conflictsByEntry = computed(() => {
@@ -88,6 +93,25 @@ export class SchedulePage {
         this.refreshConflicts();
       },
       error: (err) => this.notify.apiError(err, 'No se pudo mover el bloque.'),
+    });
+  }
+
+  protected async deleteEntry(entry: ScheduleEntry): Promise<void> {
+    const name = this.store.subjectsById().get(entry.materia_id)?.nombre ?? 'este bloque';
+    const accepted = await this.confirm.ask({
+      title: '¿Eliminar este bloque?',
+      message: `Se quitará la clase de ${name} del ${entry.dia_semana}. La materia quedará con horas sin programar hasta que generes el horario de nuevo.`,
+      confirmText: 'Eliminar bloque',
+      danger: true,
+    });
+    if (!accepted) return;
+    this.store.deleteEntry(entry.id).subscribe({
+      next: () => {
+        this.notify.success('Bloque eliminado.');
+        this.selectedId.set(null);
+        this.refreshConflicts();
+      },
+      error: (err) => this.notify.apiError(err, 'No se pudo eliminar el bloque.'),
     });
   }
 

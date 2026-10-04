@@ -26,6 +26,13 @@
                 cdkDrag
                 [cdkDragData]="entry"
                 class="block"
+                tabindex="0"
+                role="button"
+                [attr.aria-label]="ariaLabel(entry)"
+                [class.selected]="selectedId() === entry.id"
+                (click)="selected.emit(entry)"
+                (keydown.enter)="selected.emit(entry)"
+                (keydown.space)="$event.preventDefault(); selected.emit(entry)"
                 [class.has-conflict]="problems.length > 0"
                 [style.borderLeftColor]="color(entry)"
                 [attr.title]="problems.length ? problems.join(' · ') : null"

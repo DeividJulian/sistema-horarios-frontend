@@ -51,13 +51,32 @@
     <p class="hint muted">Arrastra un bloque a una casilla vacía para reprogramarlo.</p>
   }
 
-  <app-schedule-grid
-    [entries]="store.entries()"
-    [subjectsById]="store.subjectsById()"
-    [classroomsById]="store.classroomsById()"
-    [filter]="filter()"
-    [conflicts]="conflictsByEntry()"
-    (moved)="move($event)"
-    (occupiedDrop)="occupiedDrop()"
-  />
+  <div class="calendar-layout">
+    <app-schedule-grid
+      [entries]="store.entries()"
+      [subjectsById]="store.subjectsById()"
+      [classroomsById]="store.classroomsById()"
+      [filter]="filter()"
+      [conflicts]="conflictsByEntry()"
+      (moved)="move($event)"
+      (occupiedDrop)="occupiedDrop()"
+      [selectedId]="selectedId()"
+      (selected)="selectedId.set($event.id)"
+    />
+
+    @if (selectedEntry(); as entry) {
+      @let subject = store.subjectsById().get(entry.materia_id);
+      <app-entry-details
+        [entry]="entry"
+        [subject]="subject"
+        [group]="subject ? store.groupsById().get(subject.grupo_id) : undefined"
+        [teacher]="subject ? store.teachersById().get(subject.profesor_id) : undefined"
+        [classroom]="store.classroomsById().get(entry.aula_id)"
+        [conflicts]="conflictsByEntry().get(entry.id) ?? []"
+        (closed)="selectedId.set(null)"
+        (moveRequested)="move($event)"
+        (deleteRequested)="deleteEntry($event)"
+      />
+    }
+  </div>
 }

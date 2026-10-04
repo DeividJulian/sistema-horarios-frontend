@@ -155,6 +155,13 @@ export class CatalogStore {
     );
   }
 
+  deleteEntry(id: number): Observable<void> {
+    return this.scheduleApi.delete(id).pipe(
+      tap(() => remove(this.entries, id)),
+      map(() => undefined),
+    );
+  }
+
   private replaceEntry(updated: ScheduleEntry): void {
     this.entries.update((list) => list.map((e) => (e.id === updated.id ? updated : e)));
   }

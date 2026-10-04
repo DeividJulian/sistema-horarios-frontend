@@ -126,3 +126,7 @@
   color: #1a0a0d;
   background: var(--danger);
 }
+
+.block.selected {
+  box-shadow: 0 0 0 2px var(--accent);
+}
