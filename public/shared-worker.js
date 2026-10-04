@@ -1,38 +1,38 @@
-// Shared Worker: una única instancia compartida por todas las pestañas abiertas de la app.
-// Sirve para avisar a las demás pestañas cuando una de ellas modifica el horario.
+// Shared Worker: a single instance shared by every open tab of the app.
+// It tells the other tabs when one of them changes the schedule.
 
-const puertos = new Set();
-let ultimoCambio = null; // estado compartido: lo último que ocurrió, aunque la pestaña se abra después
+const ports = new Set();
+let lastChange = null; // shared state: the latest change, even for tabs opened later
 
-function enviarATodos(mensaje) {
-  for (const puerto of puertos) puerto.postMessage(mensaje);
+function sendToAll(message) {
+  for (const port of ports) port.postMessage(message);
 }
 
-function enviarAOtros(mensaje, origen) {
-  for (const puerto of puertos) {
-    if (puerto !== origen) puerto.postMessage(mensaje);
+function sendToOthers(message, origin) {
+  for (const port of ports) {
+    if (port !== origin) port.postMessage(message);
   }
 }
 
-self.onconnect = (evento) => {
-  const puerto = evento.ports[0];
-  puertos.add(puerto);
+self.onconnect = (event) => {
+  const port = event.ports[0];
+  ports.add(port);
 
-  puerto.onmessage = (mensaje) => {
-    const datos = mensaje.data || {};
+  port.onmessage = (message) => {
+    const data = message.data || {};
 
-    if (datos.tipo === 'cambio-horario') {
-      ultimoCambio = { accion: String(datos.accion || 'cambio'), hora: Date.now() };
-      enviarAOtros({ tipo: 'cambio-horario', ...ultimoCambio }, puerto);
+    if (data.type === 'schedule-changed') {
+      lastChange = { action: String(data.action || 'change'), time: Date.now() };
+      sendToOthers({ type: 'schedule-changed', ...lastChange }, port);
     }
 
-    if (datos.tipo === 'desconectar') {
-      puertos.delete(puerto);
-      enviarATodos({ tipo: 'pestanas', total: puertos.size });
+    if (data.type === 'disconnect') {
+      ports.delete(port);
+      sendToAll({ type: 'tabs', total: ports.size });
     }
   };
 
-  // La pestaña nueva recibe el estado actual y todas las demás se enteran de que hay una más
-  puerto.postMessage({ tipo: 'inicio', total: puertos.size, ultimoCambio });
-  enviarAOtros({ tipo: 'pestanas', total: puertos.size }, puerto);
+  // The new tab gets the current state and every other tab learns there is one more
+  port.postMessage({ type: 'init', total: ports.size, lastChange });
+  sendToOthers({ type: 'tabs', total: ports.size }, port);
 };

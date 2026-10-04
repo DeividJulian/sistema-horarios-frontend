@@ -8,14 +8,14 @@ import { StudentGroupService } from './core/api/student-group.service';
 import { SubjectService } from './core/api/subject.service';
 import { TeacherService } from './core/api/teacher.service';
 import { Classroom, ScheduleEntry, StudentGroup, Subject, Teacher, WEEKDAYS, Weekday, toApiTime } from './core/models';
-import { ResultadoAnalisis } from './analisis-horario.worker';
-import { EstadoConexion } from './estado-conexion';
-import { SincronizacionService } from './sincronizacion.service';
+import { TabSyncService } from './core/services/tab-sync.service';
+import { ConnectionStatus } from './shared/connection-status/connection-status';
+import { AnalysisResult } from './workers/schedule-analysis';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, DragDropModule, EstadoConexion],
+  imports: [CommonModule, DragDropModule, ConnectionStatus],
   template: `
     <div class="app">
       <header class="cabecera">
@@ -60,16 +60,16 @@ import { SincronizacionService } from './sincronizacion.service';
       <section class="panel-analisis" *ngIf="analisis() as r">
         <div class="analisis-columna">
           <h3>Franjas muertas por profesor</h3>
-          <p class="analisis-fila" *ngFor="let p of r.huecosPorProfesor">
-            <span>{{ p.profesorNombre }}</span>
-            <strong [class.alerta]="p.horasLibresEntreClases > 0">{{ p.horasLibresEntreClases }}h libres entre clases</strong>
+          <p class="analisis-fila" *ngFor="let p of r.idleHoursByTeacher">
+            <span>{{ p.teacherName }}</span>
+            <strong [class.alerta]="p.idleHours > 0">{{ p.idleHours }}h libres entre clases</strong>
           </p>
         </div>
         <div class="analisis-columna">
           <h3>Ocupación por aula</h3>
-          <p class="analisis-fila" *ngFor="let a of r.ocupacionPorAula">
-            <span>{{ a.aulaNombre }}</span>
-            <strong>{{ a.horasOcupadas }}h · {{ a.porcentajeOcupacion }}%</strong>
+          <p class="analisis-fila" *ngFor="let a of r.classroomUsage">
+            <span>{{ a.classroomName }}</span>
+            <strong>{{ a.hoursUsed }}h · {{ a.usagePercent }}%</strong>
           </p>
         </div>
       </section>
@@ -111,7 +111,7 @@ import { SincronizacionService } from './sincronizacion.service';
         </div>
       </section>
 
-      <app-estado-conexion />
+      <app-connection-status />
     </div>
   `,
   styles: [`
@@ -409,14 +409,14 @@ export class App implements OnInit {
   filtroGrupo = signal<number | null>(null);
   filtroAula = signal<number | null>(null);
 
-  analisis = signal<ResultadoAnalisis | null>(null);
+  analisis = signal<AnalysisResult | null>(null);
 
   todasLasCeldas: string[] = [];
   private worker?: Worker;
 
   private paletaMaterias = ['#f5a623', '#2dd4bf', '#fb7185', '#38bdf8', '#a78bfa', '#a3e635'];
 
-  private sincronizacion = inject(SincronizacionService);
+  private tabSync = inject(TabSyncService);
 
   private teacherService = inject(TeacherService);
   private classroomService = inject(ClassroomService);
@@ -427,7 +427,7 @@ export class App implements OnInit {
   constructor() {
     // Cuando otra pestaña modifica el horario (aviso del Shared Worker), esta pestaña recarga los datos
     effect(() => {
-      if (this.sincronizacion.cambiosRemotos() > 0) {
+      if (this.tabSync.remoteChanges() > 0) {
         untracked(() => this.cargarDatos());
       }
     });
@@ -441,8 +441,8 @@ export class App implements OnInit {
     }
 
     if (typeof Worker !== 'undefined') {
-      this.worker = new Worker(new URL('./analisis-horario.worker', import.meta.url));
-      this.worker.onmessage = ({ data }: { data: ResultadoAnalisis }) => {
+      this.worker = new Worker(new URL('./workers/schedule-analysis.worker', import.meta.url));
+      this.worker.onmessage = ({ data }: { data: AnalysisResult }) => {
         this.analisis.set(data);
       };
     }
@@ -480,10 +480,10 @@ export class App implements OnInit {
       return;
     }
     this.worker.postMessage({
-      horarios: this.horarios(),
-      materias: Array.from(this.materiasMap().values()),
-      profesores: this.profesores(),
-      aulas: this.aulas(),
+      entries: this.horarios(),
+      subjects: Array.from(this.materiasMap().values()),
+      teachers: this.profesores(),
+      classrooms: this.aulas(),
     });
   }
 
