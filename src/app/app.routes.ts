@@ -20,6 +20,11 @@ export const routes: Routes = [
         title: 'Profesores',
         loadComponent: () => import('./features/management/teachers-section/teachers-section').then((m) => m.TeachersSection),
       },
+      {
+        path: 'aulas',
+        title: 'Aulas',
+        loadComponent: () => import('./features/management/classrooms-section/classrooms-section').then((m) => m.ClassroomsSection),
+      },
     ],
   },
   { path: '**', redirectTo: 'horario' },

@@ -1,0 +1,64 @@
+<div class="crud-layout">
+  <section class="panel" aria-labelledby="classrooms-title">
+    <h2 id="classrooms-title">Aulas <span class="badge">{{ store.classrooms().length }}</span></h2>
+    @if (store.classrooms().length === 0) {
+      <p class="muted">Todavía no hay aulas. Sin aulas no se puede generar el horario.</p>
+    } @else {
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Nombre</th>
+              <th scope="col">Aforo</th>
+              <th scope="col">Horas en el horario</th>
+              <th scope="col"><span class="sr-only">Acciones</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of store.classrooms(); track c.id) {
+              <tr>
+                <td>{{ c.nombre }}</td>
+                <td class="num">{{ c.aforo }}</td>
+                <td class="num">{{ hoursUsed().get(c.id) ?? 0 }}</td>
+                <td>
+                  <div class="row-actions">
+                    <button type="button" class="btn-secondary" (click)="edit(c)" [attr.aria-label]="'Editar ' + c.nombre">Editar</button>
+                    <button type="button" class="btn-danger" (click)="remove(c)" [attr.aria-label]="'Eliminar ' + c.nombre">Eliminar</button>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <section class="panel" aria-labelledby="classroom-form-title">
+    <h2 id="classroom-form-title">{{ editing() ? 'Editar aula' : 'Nueva aula' }}</h2>
+    <form class="form-stack" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <label class="field">
+        <span class="field-label">Nombre</span>
+        <input formControlName="nombre" placeholder="Aula 101" [attr.aria-invalid]="!!errorMessage(form.controls.nombre, 'El nombre')" />
+        @if (errorMessage(form.controls.nombre, 'El nombre'); as msg) {
+          <p class="field-error">{{ msg }}</p>
+        }
+      </label>
+      <label class="field">
+        <span class="field-label">Aforo (estudiantes)</span>
+        <input formControlName="aforo" type="number" min="1" max="500" [attr.aria-invalid]="!!errorMessage(form.controls.aforo, 'El aforo')" />
+        @if (errorMessage(form.controls.aforo, 'El aforo'); as msg) {
+          <p class="field-error">{{ msg }}</p>
+        }
+      </label>
+      <div class="form-actions">
+        @if (editing()) {
+          <button type="button" class="btn-secondary" (click)="cancel()">Cancelar</button>
+        }
+        <button type="submit" class="btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Guardando…' : editing() ? 'Guardar cambios' : 'Crear aula' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
