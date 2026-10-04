@@ -45,8 +45,8 @@ function analizarHorario(data: DatosEntrada): ResultadoAnalisis {
     return { profesorNombre: profesor.nombre, horasLibresEntreClases: horasLibres };
   });
 
-  // --- Ocupación por aula (sobre una semana de 6:00 a 20:00, 5 días = 70 bloques posibles) ---
-  const bloquesPorSemana = 5 * 14;
+  // --- Ocupación por aula: 5 días x 15 horas de inicio (6:00 a 20:00) = 75 bloques posibles, igual que el backend ---
+  const bloquesPorSemana = 5 * 15;
   const ocupacionPorAula = aulas.map((aula) => {
     const horasOcupadas = horarios.filter((h) => h.aula_id === aula.id).length;
     return {
