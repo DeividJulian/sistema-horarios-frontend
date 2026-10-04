@@ -148,3 +148,26 @@ h2 {
     grid-template-columns: 1fr;
   }
 }
+
+.demo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.demo .small {
+  margin: 0;
+}
+
+.demo-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.demo-actions a {
+  text-decoration: none;
+}

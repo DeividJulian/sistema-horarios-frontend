@@ -16,11 +16,11 @@
 } @else {
   @let s = stats()!;
   <section class="tiles" aria-label="Totales">
-    <div class="tile panel"><span class="tile-value">{{ s.totales.profesores }}</span><span class="tile-label">Profesores</span></div>
-    <div class="tile panel"><span class="tile-value">{{ s.totales.aulas }}</span><span class="tile-label">Aulas</span></div>
-    <div class="tile panel"><span class="tile-value">{{ s.totales.grupos }}</span><span class="tile-label">Grupos</span></div>
-    <div class="tile panel"><span class="tile-value">{{ s.totales.materias }}</span><span class="tile-label">Materias</span></div>
-    <div class="tile panel"><span class="tile-value">{{ s.totales.bloques_programados }}</span><span class="tile-label">Bloques programados</span></div>
+    <div class="tile panel"><span class="tile-value">{{ s.totales.profesores }}</span>&ngsp;<span class="tile-label">Profesores</span></div>
+    <div class="tile panel"><span class="tile-value">{{ s.totales.aulas }}</span>&ngsp;<span class="tile-label">Aulas</span></div>
+    <div class="tile panel"><span class="tile-value">{{ s.totales.grupos }}</span>&ngsp;<span class="tile-label">Grupos</span></div>
+    <div class="tile panel"><span class="tile-value">{{ s.totales.materias }}</span>&ngsp;<span class="tile-label">Materias</span></div>
+    <div class="tile panel"><span class="tile-value">{{ s.totales.bloques_programados }}</span>&ngsp;<span class="tile-label">Bloques programados</span></div>
   </section>
 
   <div class="grid">
@@ -80,6 +80,23 @@
       <app-bar-list label="Bloques por día" [items]="dayBars()" />
     </section>
   </div>
+
+  <section class="panel demo" aria-labelledby="demo-title">
+    <div>
+      <h2 id="demo-title">Datos de demostración</h2>
+      <p class="muted small">
+        Carga 5 profesores, 4 aulas, 3 grupos y 7 materias (20 horas semanales) para probar el generador o preparar una presentación.
+      </p>
+    </div>
+    <div class="demo-actions">
+      @if (seeded()) {
+        <a class="btn-primary" routerLink="/horario">Ir a generar el horario</a>
+      }
+      <button type="button" class="btn-secondary" (click)="loadDemoData()" [disabled]="seeding()">
+        {{ seeding() ? 'Cargando…' : 'Cargar datos de demostración' }}
+      </button>
+    </div>
+  </section>
 
   <section class="panel teachers" aria-labelledby="load-title">
     <h2 id="load-title">Carga de profesores</h2>
