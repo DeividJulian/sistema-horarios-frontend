@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-import { Horario, Materia, Profesor, Aula } from './horario.service';
+import { Classroom, ScheduleEntry, Subject, Teacher } from './core/models';
 
 export interface ResultadoAnalisis {
   huecosPorProfesor: { profesorNombre: string; horasLibresEntreClases: number }[];
@@ -8,10 +8,10 @@ export interface ResultadoAnalisis {
 }
 
 interface DatosEntrada {
-  horarios: Horario[];
-  materias: Materia[];
-  profesores: Profesor[];
-  aulas: Aula[];
+  horarios: ScheduleEntry[];
+  materias: Subject[];
+  profesores: Teacher[];
+  aulas: Classroom[];
 }
 
 addEventListener('message', ({ data }: { data: DatosEntrada }) => {

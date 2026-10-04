@@ -1,0 +1,9 @@
+export interface Subject {
+  id: number;
+  nombre: string;
+  intensidad_horaria: number;
+  grupo_id: number;
+  profesor_id: number;
+}
+
+export type SubjectInput = Omit<Subject, 'id'>;

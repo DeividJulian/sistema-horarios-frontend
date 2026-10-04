@@ -2,7 +2,12 @@ import { Component, OnInit, effect, inject, signal, untracked } from '@angular/c
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { forkJoin } from 'rxjs';
-import { HorarioService, Horario, Materia, Aula, Grupo, Profesor } from './horario.service';
+import { ClassroomService } from './core/api/classroom.service';
+import { ScheduleService } from './core/api/schedule.service';
+import { StudentGroupService } from './core/api/student-group.service';
+import { SubjectService } from './core/api/subject.service';
+import { TeacherService } from './core/api/teacher.service';
+import { Classroom, ScheduleEntry, StudentGroup, Subject, Teacher, WEEKDAYS, Weekday, toApiTime } from './core/models';
 import { ResultadoAnalisis } from './analisis-horario.worker';
 import { EstadoConexion } from './estado-conexion';
 import { SincronizacionService } from './sincronizacion.service';
@@ -389,16 +394,16 @@ import { SincronizacionService } from './sincronizacion.service';
   `]
 })
 export class App implements OnInit {
-  dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
+  dias = WEEKDAYS;
   horas = [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
 
-  horarios = signal<Horario[]>([]);
-  materiasMap = signal<Map<number, Materia>>(new Map());
-  aulasMap = signal<Map<number, Aula>>(new Map());
+  horarios = signal<ScheduleEntry[]>([]);
+  materiasMap = signal<Map<number, Subject>>(new Map());
+  aulasMap = signal<Map<number, Classroom>>(new Map());
 
-  profesores = signal<Profesor[]>([]);
-  grupos = signal<Grupo[]>([]);
-  aulas = signal<Aula[]>([]);
+  profesores = signal<Teacher[]>([]);
+  grupos = signal<StudentGroup[]>([]);
+  aulas = signal<Classroom[]>([]);
 
   filtroProfesor = signal<number | null>(null);
   filtroGrupo = signal<number | null>(null);
@@ -413,7 +418,13 @@ export class App implements OnInit {
 
   private sincronizacion = inject(SincronizacionService);
 
-  constructor(private horarioService: HorarioService) {
+  private teacherService = inject(TeacherService);
+  private classroomService = inject(ClassroomService);
+  private groupService = inject(StudentGroupService);
+  private subjectService = inject(SubjectService);
+  private scheduleService = inject(ScheduleService);
+
+  constructor() {
     // Cuando otra pestaña modifica el horario (aviso del Shared Worker), esta pestaña recarga los datos
     effect(() => {
       if (this.sincronizacion.cambiosRemotos() > 0) {
@@ -441,11 +452,11 @@ export class App implements OnInit {
 
   cargarDatos(): void {
     forkJoin({
-      materias: this.horarioService.getMaterias(),
-      aulas: this.horarioService.getAulas(),
-      horarios: this.horarioService.getHorarios(),
-      profesores: this.horarioService.getProfesores(),
-      grupos: this.horarioService.getGrupos(),
+      materias: this.subjectService.list(),
+      aulas: this.classroomService.list(),
+      horarios: this.scheduleService.list(),
+      profesores: this.teacherService.list(),
+      grupos: this.groupService.list(),
     }).subscribe(({ materias, aulas, horarios, profesores, grupos }) => {
       this.materiasMap.set(new Map(materias.map((m) => [m.id, m])));
       this.aulasMap.set(new Map(aulas.map((a) => [a.id, a])));
@@ -457,7 +468,7 @@ export class App implements OnInit {
   }
 
   generarHorario(): void {
-    this.horarioService.generarHorario().subscribe({
+    this.scheduleService.generate().subscribe({
       next: () => this.cargarDatos(),
       error: (err) => alert(err.error?.detail || 'No se pudo generar el horario'),
     });
@@ -494,7 +505,7 @@ export class App implements OnInit {
     this.filtroAula.set(null);
   }
 
-  idCelda(dia: string, hora: number): string {
+  idCelda(dia: Weekday, hora: number): string {
     return `${dia}-${hora}`;
   }
 
@@ -506,7 +517,7 @@ export class App implements OnInit {
     return this.paletaMaterias[materiaId % this.paletaMaterias.length];
   }
 
-  horarioVisible(h: Horario): boolean {
+  horarioVisible(h: ScheduleEntry): boolean {
     const materia = this.materiasMap().get(h.materia_id);
     if (!materia) return false;
     if (this.filtroProfesor() !== null && materia.profesor_id !== this.filtroProfesor()) return false;
@@ -515,7 +526,7 @@ export class App implements OnInit {
     return true;
   }
 
-  obtenerHorario(dia: string, hora: number): Horario | null {
+  obtenerHorario(dia: Weekday, hora: number): ScheduleEntry | null {
     return (
       this.horarios().find(
         (h) =>
@@ -534,10 +545,10 @@ export class App implements OnInit {
     return this.aulasMap().get(id)?.nombre ?? '—';
   }
 
-  onDrop(event: CdkDragDrop<Horario | null>, diaDestino: string, horaDestino: number): void {
+  onDrop(event: CdkDragDrop<ScheduleEntry | null>, diaDestino: Weekday, horaDestino: number): void {
     if (event.previousContainer === event.container) return;
 
-    const horario: Horario | undefined = event.item.data;
+    const horario: ScheduleEntry | undefined = event.item.data;
     if (!horario) return;
 
     const yaOcupado = this.obtenerHorario(diaDestino, horaDestino);
@@ -546,7 +557,7 @@ export class App implements OnInit {
       return;
     }
 
-    const horaTexto = `${horaDestino.toString().padStart(2, '0')}:00:00`;
+    const horaTexto = toApiTime(horaDestino);
     const estadoAnterior = {
       dia_semana: horario.dia_semana,
       hora_inicio: horario.hora_inicio,
@@ -560,14 +571,14 @@ export class App implements OnInit {
               ...h,
               dia_semana: diaDestino,
               hora_inicio: horaTexto,
-              hora_fin: `${(horaDestino + 1).toString().padStart(2, '0')}:00:00`,
+              hora_fin: toApiTime(horaDestino + 1),
             }
           : h
       )
     );
 
-    this.horarioService
-      .moverHorario(horario.id, { dia_semana: diaDestino, hora_inicio: horaTexto })
+    this.scheduleService
+      .move(horario.id, { dia_semana: diaDestino, hora_inicio: horaTexto })
       .subscribe({
         next: (actualizado) => {
           this.horarios.update((lista) =>
