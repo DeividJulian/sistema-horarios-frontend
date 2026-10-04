@@ -1,5 +1,5 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { Observable, finalize, forkJoin, tap } from 'rxjs';
+import { Injectable, WritableSignal, computed, inject, signal } from '@angular/core';
+import { Observable, finalize, forkJoin, map, switchMap, tap } from 'rxjs';
 
 import { ClassroomService } from '../api/classroom.service';
 import { ScheduleService } from '../api/schedule.service';
@@ -9,16 +9,28 @@ import { TeacherService } from '../api/teacher.service';
 import { apiErrorMessage } from '../http/api-error';
 import {
   Classroom,
+  ClassroomInput,
   GenerationResult,
   ScheduleEntry,
   StudentGroup,
+  StudentGroupInput,
   Subject,
+  SubjectInput,
   Teacher,
+  TeacherInput,
   Weekday,
   toApiTime,
 } from '../models';
 
 const byId = <T extends { id: number }>(items: T[]) => new Map(items.map((item) => [item.id, item]));
+
+function upsert<T extends { id: number }>(list: WritableSignal<T[]>, item: T): void {
+  list.update((items) => (items.some((x) => x.id === item.id) ? items.map((x) => (x.id === item.id ? item : x)) : [...items, item]));
+}
+
+function remove<T extends { id: number }>(list: WritableSignal<T[]>, id: number): void {
+  list.update((items) => items.filter((x) => x.id !== id));
+}
 
 /**
  * Single source of truth for the data every page shares (teachers, classrooms, groups,
@@ -87,6 +99,59 @@ export class CatalogStore {
         next: (saved) => this.replaceEntry(saved),
         error: () => this.replaceEntry(previous),
       }),
+    );
+  }
+
+  // ---------- Catalog changes: call the API and keep the local state in sync ----------
+
+  saveTeacher(id: number | null, data: TeacherInput): Observable<Teacher> {
+    const request = id === null ? this.teacherApi.create(data) : this.teacherApi.update(id, data);
+    return request.pipe(tap((saved) => upsert(this.teachers, saved)));
+  }
+
+  deleteTeacher(id: number): Observable<void> {
+    return this.teacherApi.delete(id).pipe(
+      tap(() => remove(this.teachers, id)),
+      map(() => undefined),
+    );
+  }
+
+  saveClassroom(id: number | null, data: ClassroomInput): Observable<Classroom> {
+    const request = id === null ? this.classroomApi.create(data) : this.classroomApi.update(id, data);
+    return request.pipe(tap((saved) => upsert(this.classrooms, saved)));
+  }
+
+  deleteClassroom(id: number): Observable<void> {
+    return this.classroomApi.delete(id).pipe(
+      tap(() => remove(this.classrooms, id)),
+      map(() => undefined),
+    );
+  }
+
+  saveGroup(id: number | null, data: StudentGroupInput): Observable<StudentGroup> {
+    const request = id === null ? this.groupApi.create(data) : this.groupApi.update(id, data);
+    return request.pipe(tap((saved) => upsert(this.groups, saved)));
+  }
+
+  deleteGroup(id: number): Observable<void> {
+    return this.groupApi.delete(id).pipe(
+      tap(() => remove(this.groups, id)),
+      map(() => undefined),
+    );
+  }
+
+  saveSubject(id: number | null, data: SubjectInput): Observable<Subject> {
+    const request = id === null ? this.subjectApi.create(data) : this.subjectApi.update(id, data);
+    return request.pipe(tap((saved) => upsert(this.subjects, saved)));
+  }
+
+  /** Deleting a subject also deletes its schedule blocks in the backend, so the blocks are reloaded. */
+  deleteSubject(id: number): Observable<void> {
+    return this.subjectApi.delete(id).pipe(
+      tap(() => remove(this.subjects, id)),
+      switchMap(() => this.scheduleApi.list()),
+      tap((entries) => this.entries.set(entries)),
+      map(() => undefined),
     );
   }
 

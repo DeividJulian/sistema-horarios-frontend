@@ -13,5 +13,8 @@ interface NavItem {
   styleUrl: './nav-bar.css',
 })
 export class NavBar {
-  protected readonly items: NavItem[] = [{ path: '/horario', label: 'Horario' }];
+  protected readonly items: NavItem[] = [
+    { path: '/horario', label: 'Horario' },
+    { path: '/gestion', label: 'Gestión' },
+  ];
 }
