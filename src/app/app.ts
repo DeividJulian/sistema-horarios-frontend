@@ -4,10 +4,11 @@ import { TabSyncService } from './core/services/tab-sync.service';
 import { CatalogStore } from './core/state/catalog.store';
 import { SchedulePage } from './features/schedule/schedule-page/schedule-page';
 import { ConnectionStatus } from './shared/connection-status/connection-status';
+import { ToastContainer } from './shared/toast-container/toast-container';
 
 @Component({
   selector: 'app-root',
-  imports: [SchedulePage, ConnectionStatus],
+  imports: [SchedulePage, ConnectionStatus, ToastContainer],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
@@ -19,7 +20,7 @@ export class App {
     // When another tab changes the schedule (Shared Worker message), this tab reloads the data
     effect(() => {
       if (this.tabSync.remoteChanges() > 0) {
-        untracked(() => this.store.load().subscribe());
+        untracked(() => this.store.load().subscribe({ error: () => undefined }));
       }
     });
   }

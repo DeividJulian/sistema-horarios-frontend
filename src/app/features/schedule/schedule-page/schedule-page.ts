@@ -1,5 +1,6 @@
 import { Component, DestroyRef, inject, signal } from '@angular/core';
 
+import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
 import { AnalysisResult } from '../../../workers/schedule-analysis';
 import { AnalysisPanel } from '../analysis-panel/analysis-panel';
@@ -15,6 +16,7 @@ import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 })
 export class SchedulePage {
   protected readonly store = inject(CatalogStore);
+  private readonly notify = inject(NotificationService);
 
   protected readonly filter = signal<ScheduleFilter>(EMPTY_FILTER);
   protected readonly analysis = signal<AnalysisResult | null>(null);
@@ -22,21 +24,24 @@ export class SchedulePage {
   private readonly worker = this.createWorker();
 
   constructor() {
-    this.store.load().subscribe();
+    this.reload();
     inject(DestroyRef).onDestroy(() => this.worker?.terminate());
   }
 
   protected generate(): void {
     this.store.generateSchedule().subscribe({
-      next: () => this.store.load().subscribe(),
-      error: (err) => alert(err.error?.detail || 'No se pudo generar el horario'),
+      next: (result) => {
+        this.notify.success(`Horario generado: ${result.total_bloques} bloques sin cruces.`);
+        this.reload();
+      },
+      error: (err) => this.notify.apiError(err, 'No se pudo generar el horario.'),
     });
   }
 
   /** The heavy analysis runs in a Web Worker so the page never freezes. */
   protected analyze(): void {
     if (!this.worker) {
-      alert('Tu navegador no soporta Web Workers.');
+      this.notify.error('Tu navegador no soporta Web Workers.');
       return;
     }
     this.worker.postMessage({
@@ -49,12 +54,19 @@ export class SchedulePage {
 
   protected move({ entry, day, hour }: EntryMove): void {
     this.store.moveEntry(entry, day, hour).subscribe({
-      error: (err) => alert(err.error?.detail || 'No se pudo mover el horario'),
+      next: () => this.notify.success('Bloque movido.'),
+      error: (err) => this.notify.apiError(err, 'No se pudo mover el bloque.'),
     });
   }
 
   protected occupiedDrop(): void {
-    alert('Esa casilla ya está ocupada. Elige una casilla vacía.');
+    this.notify.info('Esa casilla ya está ocupada. Elige una casilla vacía.');
+  }
+
+  private reload(): void {
+    this.store.load().subscribe({
+      error: (err) => this.notify.apiError(err, 'No se pudieron cargar los datos.'),
+    });
   }
 
   private createWorker(): Worker | null {
