@@ -1,9 +1,11 @@
 import { ApplicationConfig, provideZonelessChangeDetection } from '@angular/core';
-import { provideHttpClient, withFetch } from '@angular/common/http';
+import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
+
+import { workersInterceptor } from './workers.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZonelessChangeDetection(),
-    provideHttpClient(withFetch())
+    provideHttpClient(withFetch(), withInterceptors([workersInterceptor]))
   ]
 };
