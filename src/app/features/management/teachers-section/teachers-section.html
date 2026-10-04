@@ -23,6 +23,15 @@
                 <td>
                   <div class="row-actions">
                     <button type="button" class="btn-secondary" (click)="edit(t)" [attr.aria-label]="'Editar ' + t.nombre">Editar</button>
+                    <button
+                      type="button"
+                      class="btn-secondary"
+                      (click)="availabilityOf.set(t)"
+                      [attr.aria-pressed]="availabilityOf()?.id === t.id"
+                      [attr.aria-label]="'Disponibilidad de ' + t.nombre"
+                    >
+                      Disponibilidad
+                    </button>
                     <button type="button" class="btn-danger" (click)="remove(t)" [attr.aria-label]="'Eliminar ' + t.nombre">Eliminar</button>
                   </div>
                 </td>
@@ -62,3 +71,7 @@
     </form>
   </section>
 </div>
+
+@if (availabilityOf(); as teacher) {
+  <app-availability-panel [teacher]="teacher" (closed)="availabilityOf.set(null)" />
+}

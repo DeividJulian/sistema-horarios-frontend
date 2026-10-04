@@ -7,10 +7,11 @@ import { NotificationService } from '../../../core/services/notification.service
 import { CatalogStore } from '../../../core/state/catalog.store';
 import { errorMessage } from '../../../shared/forms/error-message';
 import { NAME_RULES } from '../../../shared/forms/validators';
+import { AvailabilityPanel } from '../availability-panel/availability-panel';
 
 @Component({
   selector: 'app-teachers-section',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, AvailabilityPanel],
   templateUrl: './teachers-section.html',
 })
 export class TeachersSection {
@@ -24,6 +25,8 @@ export class TeachersSection {
   });
 
   protected readonly editing = signal<Teacher | null>(null);
+  /** Teacher whose availability panel is open. */
+  protected readonly availabilityOf = signal<Teacher | null>(null);
   protected readonly saving = signal(false);
   protected readonly errorMessage = errorMessage;
 
@@ -76,6 +79,7 @@ export class TeachersSection {
       next: () => {
         this.notify.success(`Profesor «${teacher.nombre}» eliminado.`);
         if (this.editing()?.id === teacher.id) this.cancel();
+        if (this.availabilityOf()?.id === teacher.id) this.availabilityOf.set(null);
       },
       error: (err) => this.notify.apiError(err, 'No se pudo eliminar el profesor.'),
     });
