@@ -1,15 +1,16 @@
 import { Component, effect, inject, untracked } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 
 import { TabSyncService } from './core/services/tab-sync.service';
 import { CatalogStore } from './core/state/catalog.store';
-import { SchedulePage } from './features/schedule/schedule-page/schedule-page';
 import { ConfirmDialog } from './shared/confirm-dialog/confirm-dialog';
 import { ConnectionStatus } from './shared/connection-status/connection-status';
+import { NavBar } from './shared/nav-bar/nav-bar';
 import { ToastContainer } from './shared/toast-container/toast-container';
 
 @Component({
   selector: 'app-root',
-  imports: [SchedulePage, ConnectionStatus, ToastContainer, ConfirmDialog],
+  imports: [RouterOutlet, NavBar, ConnectionStatus, ToastContainer, ConfirmDialog],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

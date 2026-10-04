@@ -1,0 +1,13 @@
+<nav class="nav" aria-label="Navegación principal">
+  <a class="brand" routerLink="/horario">
+    <span class="brand-mark" aria-hidden="true">H</span>
+    <span>Horarios y Aulas</span>
+  </a>
+  <ul>
+    @for (item of items; track item.path) {
+      <li>
+        <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page">{{ item.label }}</a>
+      </li>
+    }
+  </ul>
+</nav>
