@@ -1,3 +1,5 @@
+<p class="section-help"><strong>Grupos.</strong> Cada curso o semestre, por ejemplo «Ingeniería de Software 7». Indica cuántos estudiantes tiene (para buscar aulas con espacio) y su <strong>jornada</strong>: mañana, tarde o noche. Sus clases solo se programan dentro de esa jornada.</p>
+
 <div class="crud-layout">
   <section class="panel" aria-labelledby="groups-title">
     <h2 id="groups-title">Grupos <span class="badge">{{ store.groups().length }}</span></h2>
@@ -21,7 +23,7 @@
               <tr>
                 <td>{{ g.nombre }}</td>
                 <td class="num">{{ g.num_estudiantes }}</td>
-                <td class="muted">{{ shiftText(g.jornada) }}</td>
+                <td class="muted nowrap">{{ shiftText(g.jornada) }}</td>
                 <td class="num">{{ subjectCount().get(g.id) ?? 0 }}</td>
                 <td>
                   @if (fittingClassrooms(g) === 0) {

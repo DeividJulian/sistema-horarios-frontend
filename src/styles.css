@@ -257,3 +257,24 @@ app-availability-panel {
   display: block;
   scroll-margin-top: 72px;
 }
+
+/* Short explanation at the top of each management section */
+.section-help {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border-left: 3px solid var(--accent);
+  background: var(--panel);
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-muted);
+  max-width: 920px;
+}
+
+.section-help strong {
+  color: var(--text);
+}
+
+.data-table .nowrap {
+  white-space: nowrap;
+}
