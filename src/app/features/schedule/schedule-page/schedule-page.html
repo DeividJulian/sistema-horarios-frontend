@@ -22,6 +22,14 @@
 } @else if (!store.loaded()) {
   <app-state-message kind="loading" title="Cargando horario…" message="Consultando profesores, aulas, grupos y materias." />
 } @else {
+  <app-getting-started
+    [counts]="counts()"
+    [readiness]="readiness()"
+    [conflicts]="conflicts()"
+    [generating]="store.generating()"
+    (generate)="generate()"
+  />
+
   <app-schedule-filters
     [teachers]="store.teachers()"
     [groups]="store.groups()"

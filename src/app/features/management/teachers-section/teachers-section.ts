@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { Teacher } from '../../../core/models';
@@ -27,8 +27,18 @@ export class TeachersSection {
   protected readonly editing = signal<Teacher | null>(null);
   /** Teacher whose availability panel is open. */
   protected readonly availabilityOf = signal<Teacher | null>(null);
+  /** ?disponibilidad=<teacher id> opens that teacher's availability editor (used by the "Arreglar" buttons). */
+  readonly disponibilidad = input<string | undefined>();
   protected readonly saving = signal(false);
   protected readonly errorMessage = errorMessage;
+
+  constructor() {
+    effect(() => {
+      const id = Number(this.disponibilidad());
+      const teacher = id ? this.store.teachersById().get(id) : undefined;
+      if (teacher) untracked(() => this.availabilityOf.set(teacher));
+    });
+  }
 
   protected readonly subjectCount = computed(() => {
     const counts = new Map<number, number>();

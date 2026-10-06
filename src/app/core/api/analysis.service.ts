@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { ConflictReport, SeedResult, Statistics } from '../models';
+import { ConflictReport, Readiness, SeedResult, Statistics } from '../models';
 import { API_URL } from './api-url';
 
 /** demo: small example. facultad: 8 semesters of Software Engineering with their shifts. */
@@ -18,6 +18,11 @@ export class AnalysisService {
 
   conflicts(): Observable<ConflictReport> {
     return this.http.get<ConflictReport>(`${API_URL}/conflictos`);
+  }
+
+  /** Everything that would stop the generator, explained in plain language. */
+  readiness(): Observable<Readiness> {
+    return this.http.get<Readiness>(`${API_URL}/diagnostico`);
   }
 
   /** Loads demo data. With reset=true the backend first DELETES every record. */

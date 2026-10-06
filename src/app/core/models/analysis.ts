@@ -56,3 +56,18 @@ export interface SeedResult {
   mensaje: string;
   resumen: { profesores: number; aulas: number; grupos: number; materias: number; horas_semanales: number };
 }
+
+export type ReadinessSection = 'aulas' | 'grupos' | 'profesores' | 'materias';
+
+/** One thing that stops the generator (GET /diagnostico). */
+export interface ReadinessProblem {
+  tipo: string;
+  mensaje: string;
+  seccion: ReadinessSection;
+  profesor_id: number | null;
+}
+
+export interface Readiness {
+  listo: boolean;
+  problemas: ReadinessProblem[];
+}

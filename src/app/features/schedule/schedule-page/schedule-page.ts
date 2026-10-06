@@ -2,7 +2,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AnalysisService } from '../../../core/api/analysis.service';
-import { Conflict, ScheduleEntry } from '../../../core/models';
+import { Conflict, Readiness, ScheduleEntry } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
@@ -13,11 +13,12 @@ import { AnalysisPanel } from '../analysis-panel/analysis-panel';
 import { EMPTY_FILTER, ScheduleFilter } from '../schedule-filter';
 import { ScheduleFilters } from '../schedule-filters/schedule-filters';
 import { EntryDetails } from '../entry-details/entry-details';
+import { GettingStarted } from '../getting-started/getting-started';
 import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 
 @Component({
   selector: 'app-schedule-page',
-  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage, RouterLink, EntryDetails],
+  imports: [ScheduleFilters, ScheduleGrid, AnalysisPanel, StateMessage, RouterLink, EntryDetails, GettingStarted],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
 })
@@ -30,6 +31,15 @@ export class SchedulePage {
   protected readonly filter = signal<ScheduleFilter>(EMPTY_FILTER);
   protected readonly analysis = signal<AnalysisResult | null>(null);
   protected readonly conflicts = signal<Conflict[]>([]);
+  protected readonly readiness = signal<Readiness | null>(null);
+
+  protected readonly counts = computed(() => ({
+    classrooms: this.store.classrooms().length,
+    groups: this.store.groups().length,
+    teachers: this.store.teachers().length,
+    subjects: this.store.subjects().length,
+    entries: this.store.entries().length,
+  }));
   protected readonly selectedId = signal<number | null>(null);
 
   /** Block whose details are open; it disappears if the block is deleted or the data reloads without it. */
@@ -126,11 +136,15 @@ export class SchedulePage {
     });
   }
 
-  /** Conflicts are computed by the backend; a failure here is not critical, so it is silent. */
+  /** Conflicts and readiness are computed by the backend; a failure here is not critical, so it is silent. */
   private refreshConflicts(): void {
     this.analysisApi.conflicts().subscribe({
       next: (report) => this.conflicts.set(report.conflictos),
       error: () => this.conflicts.set([]),
+    });
+    this.analysisApi.readiness().subscribe({
+      next: (readiness) => this.readiness.set(readiness),
+      error: () => this.readiness.set(null),
     });
   }
 
