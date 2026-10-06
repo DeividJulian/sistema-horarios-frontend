@@ -85,15 +85,19 @@
     <div>
       <h2 id="demo-title">Datos de demostración</h2>
       <p class="muted small">
-        Carga 5 profesores, 4 aulas, 3 grupos y 7 materias (20 horas semanales) para probar el generador o preparar una presentación.
+        <strong>Demo pequeña:</strong> 5 profesores, 4 aulas, 3 grupos y 7 materias (20 h semanales).<br />
+        <strong>Facultad:</strong> los 8 semestres de Ingeniería de Software con su jornada (mañana, tarde y noche): 18 profesores, 8 aulas y 45 materias (130 h).
       </p>
     </div>
     <div class="demo-actions">
       @if (seeded()) {
         <a class="btn-primary" routerLink="/horario">Ir a generar el horario</a>
       }
-      <button type="button" class="btn-secondary" (click)="loadDemoData()" [disabled]="seeding()">
-        {{ seeding() ? 'Cargando…' : 'Cargar datos de demostración' }}
+      <button type="button" class="btn-secondary" (click)="loadDemoData('demo')" [disabled]="seeding()">
+        {{ seeding() ? 'Cargando…' : 'Cargar demo pequeña' }}
+      </button>
+      <button type="button" class="btn-secondary" (click)="loadDemoData('facultad')" [disabled]="seeding()">
+        Cargar facultad (8 semestres)
       </button>
     </div>
   </section>

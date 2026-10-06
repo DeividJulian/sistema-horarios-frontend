@@ -4,7 +4,7 @@ import { Component, computed, effect, inject, signal, untracked } from '@angular
 import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
-import { AnalysisService } from '../../../core/api/analysis.service';
+import { AnalysisService, SeedDataset } from '../../../core/api/analysis.service';
 import { apiErrorMessage } from '../../../core/http/api-error';
 import { ConflictReport, Statistics } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
@@ -70,9 +70,9 @@ export class AnalysisPage {
    * Loads the demo data. If the database already has data the backend answers 409, and only after an
    * explicit destructive confirmation the request is repeated with ?reiniciar=true (which deletes everything).
    */
-  protected loadDemoData(reset = false): void {
+  protected loadDemoData(dataset: SeedDataset, reset = false): void {
     this.seeding.set(true);
-    this.api.seed(reset).subscribe({
+    this.api.seed(dataset, reset).subscribe({
       next: (result) => {
         const r = result.resumen;
         this.notify.success(
@@ -93,7 +93,7 @@ export class AnalysisPage {
             confirmText: 'Borrar todo y cargar demo',
             danger: true,
           });
-          if (accepted) this.loadDemoData(true);
+          if (accepted) this.loadDemoData(dataset, true);
           return;
         }
         this.notify.apiError(err, 'No se pudieron cargar los datos de demostración.');
