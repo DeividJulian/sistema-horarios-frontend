@@ -9,6 +9,7 @@
           <thead>
             <tr>
               <th scope="col">Nombre</th>
+              <th scope="col">Tipo</th>
               <th scope="col">Aforo</th>
               <th scope="col">Horas en el horario</th>
               <th scope="col"><span class="sr-only">Acciones</span></th>
@@ -18,6 +19,7 @@
             @for (c of store.classrooms(); track c.id) {
               <tr>
                 <td>{{ c.nombre }}</td>
+                <td class="muted">{{ roomTypeLabel(c.tipo) }}</td>
                 <td class="num">{{ c.aforo }}</td>
                 <td class="num">{{ hoursUsed().get(c.id) ?? 0 }}</td>
                 <td>
@@ -50,6 +52,15 @@
         @if (errorMessage(form.controls.aforo, 'El aforo'); as msg) {
           <p class="field-error">{{ msg }}</p>
         }
+      </label>
+      <label class="field">
+        <span class="field-label">Tipo de aula</span>
+        <select formControlName="tipo">
+          @for (t of roomTypes; track t.value) {
+            <option [value]="t.value">{{ t.label }}</option>
+          }
+        </select>
+        <span class="field-hint">Las materias que exigen sala de informática o laboratorio solo se programan en aulas de ese tipo.</span>
       </label>
       <div class="form-actions">
         @if (editing()) {

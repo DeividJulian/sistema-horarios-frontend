@@ -37,6 +37,7 @@ export type ConflictKind =
   | 'sobrecupo'
   | 'fuera_de_disponibilidad'
   | 'fuera_de_jornada'
+  | 'tipo_de_aula'
   | 'intensidad_incorrecta';
 
 export interface Conflict {
