@@ -7,5 +7,6 @@ export const CONFLICT_LABELS: Record<ConflictKind, string> = {
   cruce_grupo: 'Cruce de grupo',
   sobrecupo: 'Sobrecupo',
   fuera_de_disponibilidad: 'Fuera de disponibilidad',
+  fuera_de_jornada: 'Fuera de la jornada',
   intensidad_incorrecta: 'Horas incompletas',
 };

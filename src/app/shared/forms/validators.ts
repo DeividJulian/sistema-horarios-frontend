@@ -9,7 +9,7 @@ export const CAPACITY_RULES = [Validators.required, Validators.min(1), Validator
 export const WEEKLY_HOURS_RULES = [Validators.required, Validators.min(1), Validators.max(5)];
 
 export const MIN_HOUR = 6;
-export const MAX_HOUR = 21;
+export const MAX_HOUR = 22;
 
 /** Length check that ignores leading/trailing spaces, like StringConstraints(strip_whitespace=True). */
 export function trimmedLength(min: number, max: number): ValidatorFn {
@@ -22,7 +22,7 @@ export function trimmedLength(min: number, max: number): ValidatorFn {
   };
 }
 
-/** Availability ranges: end after start and inside the calendar (6:00 to 21:00). */
+/** Availability ranges: end after start and inside the calendar (6:00 to 22:00). */
 export function hourRange(startKey: string, endKey: string): ValidatorFn {
   return (group: AbstractControl): ValidationErrors | null => {
     const start = Number(group.get(startKey)?.value);

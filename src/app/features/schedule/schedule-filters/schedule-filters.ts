@@ -1,6 +1,6 @@
 import { Component, input, model } from '@angular/core';
 
-import { Classroom, StudentGroup, Teacher } from '../../../core/models';
+import { Classroom, StudentGroup, Teacher, shiftInfo } from '../../../core/models';
 import { EMPTY_FILTER, ScheduleFilter } from '../schedule-filter';
 
 @Component({
@@ -16,6 +16,11 @@ export class ScheduleFilters {
 
   protected update(key: keyof ScheduleFilter, value: string): void {
     this.filter.update((f) => ({ ...f, [key]: value === '' ? null : Number(value) }));
+  }
+
+  protected groupLabel(group: StudentGroup): string {
+    const shift = shiftInfo(group.jornada);
+    return shift.value === 'todo' ? group.nombre : `${group.nombre} · ${shift.label}`;
   }
 
   protected clear(): void {

@@ -13,8 +13,8 @@ export interface AnalysisInput {
   classrooms: Classroom[];
 }
 
-// 5 days x 15 start hours (6:00 to 20:00) = 75 possible blocks, same as the backend
-export const BLOCKS_PER_WEEK = 5 * 15;
+// 5 days x 16 start hours (6:00 to 21:00) = 80 possible blocks, same as the backend
+export const BLOCKS_PER_WEEK = 5 * 16;
 
 export function analyzeSchedule({ entries, subjects, teachers, classrooms }: AnalysisInput): AnalysisResult {
   // Idle gaps (free hours between two classes on the same day) per teacher

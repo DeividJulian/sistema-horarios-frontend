@@ -1,6 +1,6 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 
-import { Classroom, ScheduleEntry, START_HOURS, StudentGroup, Subject, Teacher, WEEKDAYS, Weekday, hourOf } from '../../../core/models';
+import { Classroom, ScheduleEntry, START_HOURS, StudentGroup, Subject, Teacher, WEEKDAYS, Weekday, hourOf, shiftText } from '../../../core/models';
 import { EntryMove } from '../schedule-grid/schedule-grid';
 
 /**
@@ -27,6 +27,7 @@ export class EntryDetails {
   protected readonly weekdays = WEEKDAYS;
   protected readonly hours = START_HOURS;
   protected readonly startHour = computed(() => hourOf(this.entry().hora_inicio));
+  protected readonly shiftText = shiftText;
 
   protected readonly targetDay = signal<Weekday>('Lunes');
   protected readonly targetHour = signal(8);

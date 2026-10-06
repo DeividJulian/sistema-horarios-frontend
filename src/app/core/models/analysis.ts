@@ -36,6 +36,7 @@ export type ConflictKind =
   | 'cruce_grupo'
   | 'sobrecupo'
   | 'fuera_de_disponibilidad'
+  | 'fuera_de_jornada'
   | 'intensidad_incorrecta';
 
 export interface Conflict {

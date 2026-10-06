@@ -30,13 +30,13 @@ describe('analyzeSchedule (Web Worker logic)', () => {
     ]);
   });
 
-  it('computes classroom usage over 75 weekly blocks, like the backend', () => {
-    expect(BLOCKS_PER_WEEK).toBe(75);
-    const entries = Array.from({ length: 15 }, (_, i) => entry(i + 1, 20, 'Miércoles', 6 + i, 2));
+  it('computes classroom usage over 80 weekly blocks, like the backend', () => {
+    expect(BLOCKS_PER_WEEK).toBe(80);
+    const entries = Array.from({ length: 16 }, (_, i) => entry(i + 1, 20, 'Miércoles', 6 + i, 2));
     const usage = analyzeSchedule({ entries, subjects, teachers, classrooms }).classroomUsage;
     expect(usage).toEqual([
       { classroomName: 'Aula 101', hoursUsed: 0, usagePercent: 0 },
-      { classroomName: 'Aula 102', hoursUsed: 15, usagePercent: 20 },
+      { classroomName: 'Aula 102', hoursUsed: 16, usagePercent: 20 },
     ]);
   });
 });

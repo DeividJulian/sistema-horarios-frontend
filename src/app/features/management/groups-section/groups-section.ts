@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 
-import { StudentGroup } from '../../../core/models';
+import { SHIFTS, Shift, StudentGroup, shiftText } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
@@ -21,11 +21,14 @@ export class GroupsSection {
   protected readonly form = inject(NonNullableFormBuilder).group({
     nombre: ['', NAME_RULES],
     num_estudiantes: [30, CAPACITY_RULES],
+    jornada: ['todo' as Shift],
   });
 
   protected readonly editing = signal<StudentGroup | null>(null);
   protected readonly saving = signal(false);
   protected readonly errorMessage = errorMessage;
+  protected readonly shifts = SHIFTS;
+  protected readonly shiftText = shiftText;
 
   protected readonly subjectCount = computed(() => {
     const counts = new Map<number, number>();
@@ -40,7 +43,7 @@ export class GroupsSection {
 
   protected edit(group: StudentGroup): void {
     this.editing.set(group);
-    this.form.reset({ nombre: group.nombre, num_estudiantes: group.num_estudiantes });
+    this.form.reset({ nombre: group.nombre, num_estudiantes: group.num_estudiantes, jornada: group.jornada });
   }
 
   protected cancel(): void {
@@ -57,7 +60,11 @@ export class GroupsSection {
     const editing = this.editing();
     this.saving.set(true);
     this.store
-      .saveGroup(editing?.id ?? null, { nombre: data.nombre.trim(), num_estudiantes: Number(data.num_estudiantes) })
+      .saveGroup(editing?.id ?? null, {
+        nombre: data.nombre.trim(),
+        num_estudiantes: Number(data.num_estudiantes),
+        jornada: data.jornada,
+      })
       .subscribe({
         next: (saved) => {
           this.notify.success(editing ? `Grupo «${saved.nombre}» actualizado.` : `Grupo «${saved.nombre}» creado.`);

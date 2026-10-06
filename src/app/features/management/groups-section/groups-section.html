@@ -10,6 +10,7 @@
             <tr>
               <th scope="col">Nombre</th>
               <th scope="col">Estudiantes</th>
+              <th scope="col">Jornada</th>
               <th scope="col">Materias</th>
               <th scope="col">Aulas con cupo</th>
               <th scope="col"><span class="sr-only">Acciones</span></th>
@@ -20,6 +21,7 @@
               <tr>
                 <td>{{ g.nombre }}</td>
                 <td class="num">{{ g.num_estudiantes }}</td>
+                <td class="muted">{{ shiftText(g.jornada) }}</td>
                 <td class="num">{{ subjectCount().get(g.id) ?? 0 }}</td>
                 <td>
                   @if (fittingClassrooms(g) === 0) {
@@ -66,6 +68,15 @@
         @if (errorMessage(form.controls.num_estudiantes, 'El número de estudiantes'); as msg) {
           <p class="field-error">{{ msg }}</p>
         }
+      </label>
+      <label class="field">
+        <span class="field-label">Jornada</span>
+        <select formControlName="jornada">
+          @for (s of shifts; track s.value) {
+            <option [value]="s.value">{{ s.value === 'todo' ? s.label + ' (6:00–22:00)' : s.label + ' (' + s.start + ':00–' + s.end + ':00)' }}</option>
+          }
+        </select>
+        <span class="field-hint">El generador solo programa las clases del grupo dentro de esta franja.</span>
       </label>
       <div class="form-actions">
         @if (editing()) {

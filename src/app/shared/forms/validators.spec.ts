@@ -26,13 +26,14 @@ describe('form validators (same rules as backend/schemas.py)', () => {
     expect(new FormControl(5, WEEKLY_HOURS_RULES).valid).toBe(true);
   });
 
-  it('hourRange rejects inverted ranges and hours outside 6:00-21:00', () => {
+  it('hourRange rejects inverted ranges and hours outside 6:00-22:00', () => {
     const form = (start: number, end: number) =>
       new FormGroup({ start: new FormControl(start), end: new FormControl(end) }, { validators: hourRange('start', 'end') });
     expect(form(10, 8).errors).toEqual({ invertedRange: true });
     expect(form(10, 10).errors).toEqual({ invertedRange: true });
     expect(form(5, 9).errors).toEqual({ outOfCalendar: true });
-    expect(form(20, 22).errors).toEqual({ outOfCalendar: true });
+    expect(form(20, 23).errors).toEqual({ outOfCalendar: true });
+    expect(form(18, 22).errors).toBeNull(); // evening classes end at 22:00
     expect(form(8, 11).errors).toBeNull();
   });
 });

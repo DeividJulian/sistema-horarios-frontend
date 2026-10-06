@@ -2,6 +2,7 @@ export * from './analysis';
 export * from './availability';
 export * from './classroom';
 export * from './schedule-entry';
+export * from './shift';
 export * from './student-group';
 export * from './subject';
 export * from './teacher';
