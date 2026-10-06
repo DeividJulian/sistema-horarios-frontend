@@ -6,5 +6,6 @@ export * from './schedule-entry';
 export * from './shift';
 export * from './student-group';
 export * from './subject';
+export * from './time-format';
 export * from './teacher';
 export * from './weekday';

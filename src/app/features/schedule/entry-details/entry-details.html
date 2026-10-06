@@ -5,7 +5,7 @@
   </header>
 
   <dl>
-    <div><dt>Horario</dt><dd>{{ entry().dia_semana }}, {{ startHour() }}:00 – {{ startHour() + 1 }}:00</dd></div>
+    <div><dt>Horario</dt><dd>{{ entry().dia_semana }}, {{ startHour() | hour }} – {{ startHour() + 1 | hour }}</dd></div>
     <div><dt>Aula</dt><dd>{{ classroom()?.nombre ?? '—' }} @if (classroom(); as c) {<span class="muted">(aforo {{ c.aforo }})</span>}</dd></div>
     <div><dt>Grupo</dt><dd>{{ group()?.nombre ?? '—' }} @if (group(); as g) {<span class="muted">({{ g.num_estudiantes }} estudiantes)</span>}</dd></div>
     @if (group(); as g) {
@@ -36,7 +36,7 @@
       <span class="field-label">Hora</span>
       <select (change)="targetHour.set(+$any($event.target).value)">
         @for (h of hours; track h) {
-          <option [value]="h" [selected]="h === targetHour()">{{ h }}:00</option>
+          <option [value]="h" [selected]="h === targetHour()">{{ h | hour }}</option>
         }
       </select>
     </label>

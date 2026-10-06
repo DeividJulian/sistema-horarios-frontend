@@ -2,16 +2,17 @@ import { Component, computed, effect, inject, input, output, signal, untracked }
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { AvailabilityService } from '../../../core/api/availability.service';
-import { Availability, Teacher, WEEKDAYS, Weekday, hourOf, toApiTime } from '../../../core/models';
+import { Availability, Teacher, WEEKDAYS, Weekday, formatHour, hourOf, toApiTime } from '../../../core/models';
 import { NotificationService } from '../../../core/services/notification.service';
 import { formErrorMessage } from '../../../shared/forms/error-message';
 import { MAX_HOUR, MIN_HOUR, hourRange } from '../../../shared/forms/validators';
+import { HourPipe } from '../../../shared/pipes/hour.pipe';
 
 const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
 
 @Component({
   selector: 'app-availability-panel',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, HourPipe],
   templateUrl: './availability-panel.html',
   styleUrl: './availability-panel.css',
 })
@@ -72,7 +73,7 @@ export class AvailabilityPanel {
       .subscribe({
         next: (created) => {
           this.slots.update((list) => [...list, created]);
-          this.notify.success(`Disponibilidad agregada: ${dia_semana} de ${start}:00 a ${end}:00.`);
+          this.notify.success(`Disponibilidad agregada: ${dia_semana} de ${formatHour(Number(start))} a ${formatHour(Number(end))}.`);
           this.saving.set(false);
         },
         error: (err) => {

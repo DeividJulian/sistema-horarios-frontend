@@ -73,7 +73,7 @@
         <span class="field-label">Jornada</span>
         <select formControlName="jornada">
           @for (s of shifts; track s.value) {
-            <option [value]="s.value">{{ s.value === 'todo' ? s.label + ' (6:00–22:00)' : s.label + ' (' + s.start + ':00–' + s.end + ':00)' }}</option>
+            <option [value]="s.value">{{ shiftOptionText(s) }}</option>
           }
         </select>
         <span class="field-hint">El generador solo programa las clases del grupo dentro de esta franja.</span>

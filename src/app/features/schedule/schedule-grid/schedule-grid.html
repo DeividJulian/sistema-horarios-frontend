@@ -9,7 +9,7 @@
 
     @for (hour of hours; track hour; let odd = $odd) {
       <div class="row" [class.row-alt]="odd">
-        <div class="hour-cell">{{ hour }}:00</div>
+        <div class="hour-cell">{{ hour | hour }}</div>
 
         @for (day of weekdays; track day) {
           <div

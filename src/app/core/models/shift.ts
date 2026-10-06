@@ -1,3 +1,5 @@
+import { formatRange } from './time-format';
+
 // Shift (jornada) of a group. The values are the API contract; the labels are what the user sees.
 export type Shift = 'todo' | 'manana' | 'tarde' | 'noche';
 
@@ -20,8 +22,13 @@ export function shiftInfo(shift: string | undefined): ShiftInfo {
   return SHIFTS.find((s) => s.value === shift) ?? SHIFTS[0];
 }
 
-/** "Noche (18:00–22:00)", or just the label for groups without a fixed shift. */
+/** "Noche (6:00 p. m. – 10:00 p. m.)", or just the label for groups without a fixed shift. */
 export function shiftText(shift: string | undefined): string {
   const info = shiftInfo(shift);
-  return info.value === 'todo' ? info.label : `${info.label} (${info.start}:00–${info.end}:00)`;
+  return info.value === 'todo' ? info.label : `${info.label} (${formatRange(info.start, info.end)})`;
+}
+
+/** Label for the shift selector, always with its hours. */
+export function shiftOptionText(info: ShiftInfo): string {
+  return `${info.label} (${formatRange(info.start, info.end)})`;
 }

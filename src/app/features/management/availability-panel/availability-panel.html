@@ -15,12 +15,12 @@
     <ul class="slots">
       @for (s of sortedSlots(); track s.id) {
         <li>
-          <span><strong>{{ s.dia_semana }}</strong> {{ hourOf(s.hora_inicio) }}:00 – {{ hourOf(s.hora_fin) }}:00</span>
+          <span><strong>{{ s.dia_semana }}</strong> {{ hourOf(s.hora_inicio) | hour }} – {{ hourOf(s.hora_fin) | hour }}</span>
           <button
             type="button"
             class="remove"
             (click)="remove(s)"
-            [attr.aria-label]="'Eliminar franja del ' + s.dia_semana + ' de ' + hourOf(s.hora_inicio) + ':00 a ' + hourOf(s.hora_fin) + ':00'"
+            [attr.aria-label]="'Eliminar franja del ' + s.dia_semana + ' de ' + (hourOf(s.hora_inicio) | hour) + ' a ' + (hourOf(s.hora_fin) | hour)"
           >
             ×
           </button>
@@ -42,7 +42,7 @@
       <span class="field-label">Desde</span>
       <select formControlName="start">
         @for (h of startHours; track h) {
-          <option [ngValue]="h">{{ h }}:00</option>
+          <option [ngValue]="h">{{ h | hour }}</option>
         }
       </select>
     </label>
@@ -50,7 +50,7 @@
       <span class="field-label">Hasta</span>
       <select formControlName="end">
         @for (h of endHours; track h) {
-          <option [ngValue]="h">{{ h }}:00</option>
+          <option [ngValue]="h">{{ h | hour }}</option>
         }
       </select>
     </label>

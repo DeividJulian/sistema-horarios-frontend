@@ -17,6 +17,6 @@ export function errorMessage(control: AbstractControl | null, label: string): st
 export function formErrorMessage(form: AbstractControl): string | null {
   if (!form.errors || !(form.touched || form.dirty)) return null;
   if (form.errors['invertedRange']) return 'La hora de fin debe ser posterior a la de inicio.';
-  if (form.errors['outOfCalendar']) return 'La disponibilidad debe estar entre las 6:00 y las 22:00.';
+  if (form.errors['outOfCalendar']) return 'La disponibilidad debe estar entre las 6:00 a. m. y las 10:00 p. m.';
   return null;
 }

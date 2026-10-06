@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 
-import { SHIFTS, Shift, StudentGroup, shiftText } from '../../../core/models';
+import { SHIFTS, Shift, StudentGroup, shiftOptionText, shiftText } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
 import { CatalogStore } from '../../../core/state/catalog.store';
@@ -29,6 +29,7 @@ export class GroupsSection {
   protected readonly errorMessage = errorMessage;
   protected readonly shifts = SHIFTS;
   protected readonly shiftText = shiftText;
+  protected readonly shiftOptionText = shiftOptionText;
 
   protected readonly subjectCount = computed(() => {
     const counts = new Map<number, number>();

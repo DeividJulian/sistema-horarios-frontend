@@ -1,6 +1,7 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 
 import { Classroom, ScheduleEntry, START_HOURS, StudentGroup, Subject, Teacher, WEEKDAYS, Weekday, hourOf, shiftText } from '../../../core/models';
+import { HourPipe } from '../../../shared/pipes/hour.pipe';
 import { EntryMove } from '../schedule-grid/schedule-grid';
 
 /**
@@ -9,6 +10,7 @@ import { EntryMove } from '../schedule-grid/schedule-grid';
  */
 @Component({
   selector: 'app-entry-details',
+  imports: [HourPipe],
   templateUrl: './entry-details.html',
   styleUrl: './entry-details.css',
 })

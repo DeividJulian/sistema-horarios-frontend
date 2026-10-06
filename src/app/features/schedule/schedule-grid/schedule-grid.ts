@@ -1,7 +1,8 @@
 import { CdkDrag, CdkDragDrop, CdkDropList, CdkDropListGroup } from '@angular/cdk/drag-drop';
 import { Component, computed, input, output } from '@angular/core';
 
-import { Classroom, ScheduleEntry, START_HOURS, Subject, WEEKDAYS, Weekday, hourOf } from '../../../core/models';
+import { Classroom, ScheduleEntry, START_HOURS, Subject, WEEKDAYS, Weekday, formatHour, hourOf } from '../../../core/models';
+import { HourPipe } from '../../../shared/pipes/hour.pipe';
 import { ScheduleFilter, matchesFilter } from '../schedule-filter';
 
 export interface EntryMove {
@@ -16,7 +17,7 @@ export const cellId = (day: Weekday, hour: number) => `${day}-${hour}`;
 
 @Component({
   selector: 'app-schedule-grid',
-  imports: [CdkDropListGroup, CdkDropList, CdkDrag],
+  imports: [CdkDropListGroup, CdkDropList, CdkDrag, HourPipe],
   templateUrl: './schedule-grid.html',
   styleUrl: './schedule-grid.css',
 })
@@ -71,7 +72,7 @@ export class ScheduleGrid {
   protected ariaLabel(entry: ScheduleEntry): string {
     const hour = hourOf(entry.hora_inicio);
     const problems = this.conflictsOf(entry).length ? ', con conflictos' : '';
-    return `${this.subjectName(entry)}, ${entry.dia_semana} ${hour}:00, ${this.classroomName(entry)}${problems}. Pulsa Enter para ver el detalle.`;
+    return `${this.subjectName(entry)}, ${entry.dia_semana} ${formatHour(hour)}, ${this.classroomName(entry)}${problems}. Pulsa Enter para ver el detalle.`;
   }
 
   protected color(entry: ScheduleEntry): string {

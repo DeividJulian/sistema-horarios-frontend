@@ -24,8 +24,9 @@
 }
 
 .hour-cell {
-  width: 76px;
-  min-width: 76px;
+  width: 104px;
+  min-width: 104px;
+  white-space: nowrap;
   padding: 10px 8px;
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
