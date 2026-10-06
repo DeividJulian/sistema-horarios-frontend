@@ -252,3 +252,8 @@ button:disabled {
   font-size: 12px;
   color: var(--text-muted);
 }
+
+app-availability-panel {
+  display: block;
+  scroll-margin-top: 72px;
+}

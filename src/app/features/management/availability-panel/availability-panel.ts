@@ -1,18 +1,21 @@
-import { Component, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, DestroyRef, ElementRef, computed, effect, inject, input, output, signal, untracked } from '@angular/core';
+import { forkJoin, of } from 'rxjs';
 
 import { AvailabilityService } from '../../../core/api/availability.service';
-import { Availability, Teacher, WEEKDAYS, Weekday, formatHour, hourOf, toApiTime } from '../../../core/models';
+import { Availability, SHIFTS, START_HOURS, ShiftInfo, Teacher, WEEKDAYS, Weekday, formatHour, toApiTime } from '../../../core/models';
+import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
-import { formErrorMessage } from '../../../shared/forms/error-message';
-import { MAX_HOUR, MIN_HOUR, hourRange } from '../../../shared/forms/validators';
+import { CatalogStore } from '../../../core/state/catalog.store';
 import { HourPipe } from '../../../shared/pipes/hour.pipe';
+import { cellKey, cellsToRanges, diffRanges, rangesToCells } from './availability-grid';
 
-const range = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => from + i);
-
+/**
+ * Visual weekly editor: each cell is one hour. Click to mark it, drag to paint several,
+ * or use the quick buttons. Nothing is sent until the user presses "Guardar".
+ */
 @Component({
   selector: 'app-availability-panel',
-  imports: [ReactiveFormsModule, HourPipe],
+  imports: [HourPipe],
   templateUrl: './availability-panel.html',
   styleUrl: './availability-panel.css',
 })
@@ -21,75 +24,180 @@ export class AvailabilityPanel {
   readonly closed = output<void>();
 
   private readonly api = inject(AvailabilityService);
+  private readonly store = inject(CatalogStore);
   private readonly notify = inject(NotificationService);
+  private readonly confirm = inject(ConfirmService);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly weekdays = WEEKDAYS;
-  protected readonly startHours = range(MIN_HOUR, MAX_HOUR - 1);
-  protected readonly endHours = range(MIN_HOUR + 1, MAX_HOUR);
-  protected readonly hourOf = hourOf;
-  protected readonly formErrorMessage = formErrorMessage;
+  protected readonly hours = START_HOURS;
+  protected readonly shifts = SHIFTS.filter((s) => s.value !== 'todo');
+  protected readonly cellKey = cellKey;
 
-  protected readonly slots = signal<Availability[]>([]);
+  /** What the backend has now. */
+  private readonly saved = signal<Availability[]>([]);
+  /** What the user sees and edits. */
+  protected readonly cells = signal<Set<string>>(new Set());
   protected readonly loading = signal(false);
   protected readonly saving = signal(false);
 
-  protected readonly sortedSlots = computed(() =>
-    [...this.slots()].sort(
-      (a, b) => WEEKDAYS.indexOf(a.dia_semana) - WEEKDAYS.indexOf(b.dia_semana) || hourOf(a.hora_inicio) - hourOf(b.hora_inicio),
-    ),
+  protected readonly weeklyHours = computed(() => this.cells().size);
+  protected readonly dirty = computed(() => {
+    const before = rangesToCells(this.saved());
+    const now = this.cells();
+    return before.size !== now.size || [...now].some((c) => !before.has(c));
+  });
+
+  /** Shifts of the groups this teacher teaches: their classes can only go inside them. */
+  protected readonly teacherShifts = computed<ShiftInfo[]>(() => {
+    const groups = this.store.groupsById();
+    const values = new Set(
+      this.store
+        .subjects()
+        .filter((s) => s.profesor_id === this.teacher().id)
+        .map((s) => groups.get(s.grupo_id)?.jornada ?? 'todo'),
+    );
+    return this.shifts.filter((s) => values.has(s.value));
+  });
+
+  protected readonly subjectsCount = computed(() => this.store.subjects().filter((s) => s.profesor_id === this.teacher().id).length);
+  protected readonly hoursNeeded = computed(() =>
+    this.store
+      .subjects()
+      .filter((s) => s.profesor_id === this.teacher().id)
+      .reduce((sum, s) => sum + s.intensidad_horaria, 0),
   );
 
-  /** Total available hours per week; the generator can only place classes inside them. */
-  protected readonly weeklyHours = computed(() =>
-    this.slots().reduce((sum, s) => sum + hourOf(s.hora_fin) - hourOf(s.hora_inicio), 0),
-  );
-
-  protected readonly form = inject(NonNullableFormBuilder).group(
-    {
-      dia_semana: ['Lunes' as Weekday, Validators.required],
-      start: [8, Validators.required],
-      end: [10, Validators.required],
-    },
-    { validators: hourRange('start', 'end') },
-  );
+  /** Drag painting: true marks cells, false clears them, null when the mouse is up. */
+  private paintValue: boolean | null = null;
 
   constructor() {
-    // Reload the list every time a different teacher is selected
     effect(() => {
       const teacher = this.teacher();
       untracked(() => this.load(teacher.id));
+      // The panel opens below the teachers table: bring it into view so the user sees it
+      setTimeout(() => this.host.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+    });
+    const stopPainting = () => (this.paintValue = null);
+    window.addEventListener('pointerup', stopPainting);
+    inject(DestroyRef).onDestroy(() => window.removeEventListener('pointerup', stopPainting));
+  }
+
+  protected isOn(day: Weekday, hour: number): boolean {
+    return this.cells().has(cellKey(day, hour));
+  }
+
+  protected inTeacherShift(hour: number): boolean {
+    return this.teacherShifts().some((s) => hour >= s.start && hour < s.end);
+  }
+
+  // ---------- Editing ----------
+
+  protected startPaint(day: Weekday, hour: number, event: PointerEvent): void {
+    event.preventDefault();
+    this.paintValue = !this.isOn(day, hour);
+    this.setCells([cellKey(day, hour)], this.paintValue);
+  }
+
+  protected continuePaint(day: Weekday, hour: number): void {
+    if (this.paintValue !== null) this.setCells([cellKey(day, hour)], this.paintValue);
+  }
+
+  /** Keyboard users toggle one cell with Enter or Space. */
+  protected toggle(day: Weekday, hour: number): void {
+    this.setCells([cellKey(day, hour)], !this.isOn(day, hour));
+  }
+
+  protected toggleDay(day: Weekday): void {
+    const keys = this.hours.map((h) => cellKey(day, h));
+    this.setCells(keys, !keys.every((k) => this.cells().has(k)));
+  }
+
+  protected toggleHour(hour: number): void {
+    const keys = this.weekdays.map((d) => cellKey(d, hour));
+    this.setCells(keys, !keys.every((k) => this.cells().has(k)));
+  }
+
+  /** Marks a whole shift from Monday to Friday. */
+  protected markShift(shift: ShiftInfo): void {
+    this.setCells(this.keysFor(shift.start, shift.end), true);
+  }
+
+  protected markTeacherShifts(): void {
+    this.setCells(this.teacherShifts().flatMap((s) => this.keysFor(s.start, s.end)), true);
+  }
+
+  protected markAllDay(): void {
+    this.setCells(this.keysFor(this.hours[0], this.hours.at(-1)! + 1), true);
+  }
+
+  protected clearAll(): void {
+    this.cells.set(new Set());
+  }
+
+  protected discard(): void {
+    this.cells.set(rangesToCells(this.saved()));
+  }
+
+  // ---------- Saving ----------
+
+  protected save(): void {
+    const { toDelete, toCreate } = diffRanges(this.saved(), cellsToRanges(this.cells()));
+    const teacherId = this.teacher().id;
+    const requests = [
+      ...toDelete.map((a) => this.api.delete(a.id)),
+      ...toCreate.map((r) =>
+        this.api.create({ profesor_id: teacherId, dia_semana: r.day, hora_inicio: toApiTime(r.start), hora_fin: toApiTime(r.end) }),
+      ),
+    ];
+    this.saving.set(true);
+    forkJoin(requests.length ? requests : [of(null)]).subscribe({
+      next: () => {
+        this.notify.success(
+          `Disponibilidad de ${this.teacher().nombre} guardada: ${this.weeklyHours()} horas por semana. ` +
+            'Si ya tenías un horario, genéralo de nuevo para aplicar el cambio.',
+        );
+        this.saving.set(false);
+        this.load(teacherId);
+      },
+      error: (err) => {
+        this.notify.apiError(err, 'No se pudo guardar toda la disponibilidad.');
+        this.saving.set(false);
+        this.load(teacherId); // show what was really saved
+      },
     });
   }
 
-  protected add(): void {
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    const { dia_semana, start, end } = this.form.getRawValue();
-    this.saving.set(true);
-    this.api
-      .create({ profesor_id: this.teacher().id, dia_semana, hora_inicio: toApiTime(Number(start)), hora_fin: toApiTime(Number(end)) })
-      .subscribe({
-        next: (created) => {
-          this.slots.update((list) => [...list, created]);
-          this.notify.success(`Disponibilidad agregada: ${dia_semana} de ${formatHour(Number(start))} a ${formatHour(Number(end))}.`);
-          this.saving.set(false);
-        },
-        error: (err) => {
-          this.notify.apiError(err, 'No se pudo agregar la disponibilidad.');
-          this.saving.set(false);
-        },
+  protected async close(): Promise<void> {
+    if (this.dirty()) {
+      const discard = await this.confirm.ask({
+        title: '¿Salir sin guardar?',
+        message: 'Marcaste horas que todavía no se han guardado. Si sales ahora se perderán.',
+        confirmText: 'Salir sin guardar',
+        cancelText: 'Seguir editando',
+        danger: true,
       });
+      if (!discard) return;
+    }
+    this.closed.emit();
   }
 
-  protected remove(slot: Availability): void {
-    this.api.delete(slot.id).subscribe({
-      next: () => {
-        this.slots.update((list) => list.filter((s) => s.id !== slot.id));
-        this.notify.success('Franja de disponibilidad eliminada.');
-      },
-      error: (err) => this.notify.apiError(err, 'No se pudo eliminar la franja.'),
+  protected rangeText(start: number, end: number): string {
+    return `${formatHour(start)} – ${formatHour(end)}`;
+  }
+
+  private keysFor(start: number, end: number): string[] {
+    return this.weekdays.flatMap((d) => this.hours.filter((h) => h >= start && h < end).map((h) => cellKey(d, h)));
+  }
+
+  private setCells(keys: string[], on: boolean): void {
+    this.cells.update((current) => {
+      const next = new Set(current);
+      for (const k of keys) {
+        if (on) next.add(k);
+        else next.delete(k);
+      }
+      return next;
     });
   }
 
@@ -97,7 +205,8 @@ export class AvailabilityPanel {
     this.loading.set(true);
     this.api.listByTeacher(teacherId).subscribe({
       next: (list) => {
-        this.slots.set(list);
+        this.saved.set(list);
+        this.cells.set(rangesToCells(list));
         this.loading.set(false);
       },
       error: (err) => {
