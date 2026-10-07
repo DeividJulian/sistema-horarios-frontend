@@ -1,6 +1,6 @@
 .toasts {
   position: fixed;
-  top: 16px;
+  top: 76px; /* below the sticky nav bar, so the Tutorial button stays clickable */
   right: 16px;
   display: flex;
   flex-direction: column;
@@ -77,5 +77,13 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .toast {
     animation: none;
+  }
+}
+
+/* On phones the nav bar wraps to two rows, so the toasts go to the bottom (above the status chips) */
+@media (max-width: 700px) {
+  .toasts {
+    top: auto;
+    bottom: 52px;
   }
 }

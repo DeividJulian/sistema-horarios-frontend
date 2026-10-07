@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+
+import { TutorialService } from '../../core/services/tutorial.service';
 
 interface NavItem {
   path: string;
@@ -13,6 +15,8 @@ interface NavItem {
   styleUrl: './nav-bar.css',
 })
 export class NavBar {
+  protected readonly tutorial = inject(TutorialService);
+
   protected readonly items: NavItem[] = [
     { path: '/horario', label: 'Horario' },
     { path: '/gestion', label: 'Gestión' },
