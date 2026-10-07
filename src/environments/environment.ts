@@ -1,5 +1,5 @@
-// Production settings. Change apiUrl to the deployed backend URL before publishing.
+// Production settings: the backend deployed on Render.
 export const environment = {
   production: true,
-  apiUrl: 'http://127.0.0.1:8000',
+  apiUrl: 'https://sistema-horarios-backend.onrender.com',
 };
