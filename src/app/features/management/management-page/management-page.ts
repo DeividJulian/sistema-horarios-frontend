@@ -20,6 +20,7 @@ export class ManagementPage {
     { path: 'aulas', label: 'Aulas' },
     { path: 'grupos', label: 'Grupos' },
     { path: 'materias', label: 'Materias' },
+    { path: 'usuarios', label: 'Usuarios' },
   ];
 
   constructor() {

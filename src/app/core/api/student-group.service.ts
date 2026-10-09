@@ -8,7 +8,7 @@ import { API_URL, ApiMessage } from './api-url';
 @Injectable({ providedIn: 'root' })
 export class StudentGroupService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${API_URL}/grupos`;
+  private readonly url = `${API_URL}/groups`;
 
   list(): Observable<StudentGroup[]> {
     return this.http.get<StudentGroup[]>(this.url);

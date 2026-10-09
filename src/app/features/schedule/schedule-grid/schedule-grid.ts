@@ -34,6 +34,8 @@ export class ScheduleGrid {
   readonly selected = output<ScheduleEntry>();
   /** Block highlighted because its details are open. */
   readonly selectedId = input<number | null>(null);
+  /** Read-only users can look at the blocks but not drag them. */
+  readonly readonly = input(false);
 
   protected readonly weekdays = WEEKDAYS;
   protected readonly hours = START_HOURS;

@@ -2,6 +2,7 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { AnalysisService } from '../../../core/api/analysis.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { Conflict, Readiness, ScheduleEntry } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
 import { NotificationService } from '../../../core/services/notification.service';
@@ -24,6 +25,7 @@ import { EntryMove, ScheduleGrid } from '../schedule-grid/schedule-grid';
 })
 export class SchedulePage {
   protected readonly store = inject(CatalogStore);
+  protected readonly auth = inject(AuthService);
   private readonly notify = inject(NotificationService);
   private readonly confirm = inject(ConfirmService);
   private readonly analysisApi = inject(AnalysisService);
@@ -41,6 +43,20 @@ export class SchedulePage {
     entries: this.store.entries().length,
   }));
   protected readonly selectedId = signal<number | null>(null);
+
+  protected readonly firstName = computed(() => this.auth.user()?.nombre.split(/\s+/)[0] ?? '');
+
+  /** Summary cards at the top of the page (icon paths are 24x24 strokes). */
+  protected readonly kpis = computed(() => {
+    const c = this.counts();
+    return [
+      { label: 'Profesores', value: c.teachers, color: '#a78bfa', icon: 'M16 19v-1a4 4 0 0 0-8 0v1M12 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+      { label: 'Aulas', value: c.classrooms, color: '#38bdf8', icon: 'M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6' },
+      { label: 'Grupos', value: c.groups, color: '#34d399', icon: 'M17 20v-1a4 4 0 0 0-3-3.87M7 20v-1a4 4 0 0 1 3-3.87M12 12a3 3 0 1 0 0-6 3 3 0 0 0 0 6z' },
+      { label: 'Materias', value: c.subjects, color: '#f472b6', icon: 'M4 19V5a2 2 0 0 1 2-2h12v16H6a2 2 0 0 0-2 2zM8 7h6' },
+      { label: 'Clases programadas', value: c.entries, color: '#fbbf24', icon: 'M8 3v3M16 3v3M4 9h16M5 5h14v15H5z' },
+    ];
+  });
 
   /** Block whose details are open; it disappears if the block is deleted or the data reloads without it. */
   protected readonly selectedEntry = computed(() => this.store.entries().find((e) => e.id === this.selectedId()) ?? null);

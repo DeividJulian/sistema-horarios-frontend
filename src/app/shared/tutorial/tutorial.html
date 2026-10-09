@@ -1,6 +1,6 @@
 <dialog #dialog class="dialog" aria-labelledby="tutorial-title" (close)="onClose()">
   <header class="head">
-    <p class="eyebrow">Tutorial · paso {{ index() + 1 }} de {{ steps.length }}</p>
+    <p class="eyebrow">Tutorial · paso {{ index() + 1 }} de {{ steps().length }}</p>
     <button type="button" class="close" (click)="tutorial.close()" aria-label="Cerrar tutorial">×</button>
   </header>
 
@@ -20,7 +20,7 @@
   }
 
   <nav class="dots" aria-label="Pasos del tutorial">
-    @for (s of steps; track $index) {
+    @for (s of steps(); track $index) {
       <button
         type="button"
         class="dot"

@@ -20,8 +20,10 @@ export class TutorialService {
     this.isOpen.set(true);
   }
 
-  close(): void {
+  /** remember=false closes it without marking it as seen (for example when the session ends). */
+  close(remember = true): void {
     this.isOpen.set(false);
+    if (!remember) return;
     try {
       localStorage.setItem(SEEN_KEY, '1');
     } catch {

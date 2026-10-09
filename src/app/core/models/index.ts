@@ -9,3 +9,4 @@ export * from './subject';
 export * from './time-format';
 export * from './teacher';
 export * from './weekday';
+export * from './user';

@@ -21,6 +21,8 @@ export class EntryDetails {
   readonly teacher = input<Teacher | undefined>();
   readonly classroom = input<Classroom | undefined>();
   readonly conflicts = input<string[]>([]);
+  /** Read-only users only see the details, without moving or deleting. */
+  readonly readonly = input(false);
 
   readonly closed = output<void>();
   readonly moveRequested = output<EntryMove>();

@@ -21,11 +21,11 @@ describe('CatalogStore', () => {
   afterEach(() => http.verify());
 
   function flushLoad(): void {
-    http.expectOne(`${API_URL}/profesores`).flush([{ id: 1, nombre: 'Ana', email: 'ana@x.co' }]);
-    http.expectOne(`${API_URL}/aulas`).flush([{ id: 1, nombre: 'Aula 101', aforo: 40 }]);
-    http.expectOne(`${API_URL}/grupos`).flush([{ id: 1, nombre: '7A', num_estudiantes: 30 }]);
-    http.expectOne(`${API_URL}/materias`).flush([{ id: 1, nombre: 'Redes', intensidad_horaria: 2, grupo_id: 1, profesor_id: 1 }]);
-    http.expectOne(`${API_URL}/horarios`).flush([entry]);
+    http.expectOne(`${API_URL}/teachers`).flush([{ id: 1, nombre: 'Ana', email: 'ana@x.co' }]);
+    http.expectOne(`${API_URL}/classrooms`).flush([{ id: 1, nombre: 'Aula 101', aforo: 40 }]);
+    http.expectOne(`${API_URL}/groups`).flush([{ id: 1, nombre: '7A', num_estudiantes: 30 }]);
+    http.expectOne(`${API_URL}/subjects`).flush([{ id: 1, nombre: 'Redes', intensidad_horaria: 2, grupo_id: 1, profesor_id: 1 }]);
+    http.expectOne(`${API_URL}/schedules`).flush([entry]);
   }
 
   it('loads every resource in parallel and builds the lookup maps', () => {
@@ -40,7 +40,7 @@ describe('CatalogStore', () => {
 
   it('keeps a readable error when loading fails', () => {
     store.load().subscribe({ error: () => undefined });
-    http.expectOne(`${API_URL}/profesores`).flush(null, { status: 0, statusText: 'Unknown Error' });
+    http.expectOne(`${API_URL}/teachers`).flush(null, { status: 0, statusText: 'Unknown Error' });
     // forkJoin cancels the other four requests as soon as one fails
     expect(http.match(() => true).every((r) => r.cancelled)).toBe(true);
     expect(store.loadError()).toContain('No se pudo conectar con el servidor');
@@ -54,7 +54,7 @@ describe('CatalogStore', () => {
     // The block moves before the backend answers...
     expect(store.entries()[0]).toMatchObject({ dia_semana: 'Viernes', hora_inicio: '15:00:00', hora_fin: '16:00:00' });
 
-    const request = http.expectOne(`${API_URL}/horarios/1`);
+    const request = http.expectOne(`${API_URL}/schedules/1`);
     expect(request.request.body).toEqual({ dia_semana: 'Viernes', hora_inicio: '15:00:00' });
     request.flush({ detail: 'El aula ya está ocupada en esa franja' }, { status: 409, statusText: 'Conflict' });
 
@@ -67,11 +67,11 @@ describe('CatalogStore', () => {
     flushLoad();
 
     store.saveClassroom(null, { nombre: 'Sala B', aforo: 25 }).subscribe();
-    http.expectOne({ method: 'POST', url: `${API_URL}/aulas` }).flush({ id: 2, nombre: 'Sala B', aforo: 25 });
+    http.expectOne({ method: 'POST', url: `${API_URL}/classrooms` }).flush({ id: 2, nombre: 'Sala B', aforo: 25 });
     expect(store.classrooms().map((c) => c.nombre)).toEqual(['Aula 101', 'Sala B']);
 
     store.deleteClassroom(1).subscribe();
-    http.expectOne({ method: 'DELETE', url: `${API_URL}/aulas/1` }).flush({ mensaje: 'Aula eliminada' });
+    http.expectOne({ method: 'DELETE', url: `${API_URL}/classrooms/1` }).flush({ mensaje: 'Aula eliminada' });
     expect(store.classrooms().map((c) => c.nombre)).toEqual(['Sala B']);
   });
 
@@ -80,8 +80,8 @@ describe('CatalogStore', () => {
     flushLoad();
 
     store.deleteSubject(1).subscribe();
-    http.expectOne({ method: 'DELETE', url: `${API_URL}/materias/1` }).flush({ mensaje: 'ok' });
-    http.expectOne({ method: 'GET', url: `${API_URL}/horarios` }).flush([]);
+    http.expectOne({ method: 'DELETE', url: `${API_URL}/subjects/1` }).flush({ mensaje: 'ok' });
+    http.expectOne({ method: 'GET', url: `${API_URL}/schedules` }).flush([]);
     expect(store.subjects()).toEqual([]);
     expect(store.entries()).toEqual([]);
   });

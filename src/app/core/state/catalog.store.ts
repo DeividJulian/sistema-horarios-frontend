@@ -83,6 +83,15 @@ export class CatalogStore {
     );
   }
 
+  /** Forgets everything (used when the session ends). */
+  reset(): void {
+    for (const list of [this.teachers, this.classrooms, this.groups, this.subjects, this.entries] as WritableSignal<unknown[]>[]) {
+      list.set([]);
+    }
+    this.loaded.set(false);
+    this.loadError.set(null);
+  }
+
   generateSchedule(): Observable<GenerationResult> {
     this.generating.set(true);
     return this.scheduleApi.generate().pipe(finalize(() => this.generating.set(false)));

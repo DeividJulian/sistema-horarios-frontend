@@ -5,8 +5,8 @@ import { tap } from 'rxjs';
 import { ConnectionService } from '../services/connection.service';
 import { TabSyncService } from '../services/tab-sync.service';
 
-// Deleting a subject also deletes its blocks, so /materias counts as a schedule change too
-const SCHEDULE_CHANGING_ROUTES = /\/(horarios|generar-horario|seed|materias)/;
+// Deleting a subject also deletes its blocks, so /subjects counts as a schedule change too
+const SCHEDULE_CHANGING_ROUTES = /\/(schedules|seed|subjects)/;
 
 /**
  * - When a request changes the schedule (POST/PUT/DELETE), tells the other tabs through the Shared Worker.

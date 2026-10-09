@@ -1,11 +1,16 @@
-<a class="skip-link" href="#contenido">Saltar al contenido</a>
-<app-nav-bar />
+@if (auth.isLoggedIn()) {
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <app-nav-bar />
+}
 
-<main class="app" id="contenido" tabindex="-1">
+<!-- A single outlet: signing out must not re-create the current page before the login page loads -->
+<main [class.app]="auth.isLoggedIn()" id="contenido" tabindex="-1">
   <router-outlet />
 </main>
 
+@if (auth.isLoggedIn()) {
+  <app-tutorial />
+  <app-connection-status />
+}
 <app-toast-container />
 <app-confirm-dialog />
-<app-tutorial />
-<app-connection-status />

@@ -1,8 +1,9 @@
 import { Component, ElementRef, computed, effect, inject, signal, viewChild } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { AuthService } from '../../core/auth/auth.service';
 import { TutorialService } from '../../core/services/tutorial.service';
-import { TUTORIAL_STEPS } from './tutorial-steps';
+import { stepsFor } from './tutorial-steps';
 
 @Component({
   selector: 'app-tutorial',
@@ -14,11 +15,14 @@ export class Tutorial {
   private readonly router = inject(Router);
   private readonly dialog = viewChild.required<ElementRef<HTMLDialogElement>>('dialog');
 
-  protected readonly steps = TUTORIAL_STEPS;
+  private readonly auth = inject(AuthService);
+
+  /** Administrators see how to set everything up; read-only users only how to consult. */
+  protected readonly steps = computed(() => stepsFor(this.auth.isAdmin()));
   protected readonly index = signal(0);
-  protected readonly step = computed(() => this.steps[this.index()]);
+  protected readonly step = computed(() => this.steps()[this.index()]);
   protected readonly isFirst = computed(() => this.index() === 0);
-  protected readonly isLast = computed(() => this.index() === this.steps.length - 1);
+  protected readonly isLast = computed(() => this.index() === this.steps().length - 1);
 
   constructor() {
     // Same pattern as the confirm dialog: the native <dialog> traps focus and closes with Escape
@@ -33,7 +37,7 @@ export class Tutorial {
   }
 
   protected goTo(index: number): void {
-    this.index.set(Math.max(0, Math.min(index, this.steps.length - 1)));
+    this.index.set(Math.max(0, Math.min(index, this.steps().length - 1)));
   }
 
   /** Closes the tutorial and opens the section the current step talks about. */

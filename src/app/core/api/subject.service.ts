@@ -8,7 +8,7 @@ import { API_URL, ApiMessage } from './api-url';
 @Injectable({ providedIn: 'root' })
 export class SubjectService {
   private readonly http = inject(HttpClient);
-  private readonly url = `${API_URL}/materias`;
+  private readonly url = `${API_URL}/subjects`;
 
   list(): Observable<Subject[]> {
     return this.http.get<Subject[]>(this.url);

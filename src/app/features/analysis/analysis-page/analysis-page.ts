@@ -5,6 +5,7 @@ import { RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 
 import { AnalysisService, SeedDataset } from '../../../core/api/analysis.service';
+import { AuthService } from '../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../core/http/api-error';
 import { ConflictReport, Statistics } from '../../../core/models';
 import { ConfirmService } from '../../../core/services/confirm.service';
@@ -29,6 +30,7 @@ export class AnalysisPage {
   private readonly store = inject(CatalogStore);
   private readonly notify = inject(NotificationService);
   private readonly confirm = inject(ConfirmService);
+  protected readonly auth = inject(AuthService);
 
   protected readonly stats = signal<Statistics | null>(null);
   protected readonly report = signal<ConflictReport | null>(null);
@@ -68,7 +70,7 @@ export class AnalysisPage {
 
   /**
    * Loads the demo data. If the database already has data the backend answers 409, and only after an
-   * explicit destructive confirmation the request is repeated with ?reiniciar=true (which deletes everything).
+   * explicit destructive confirmation the request is repeated with ?reset=true (which deletes everything).
    */
   protected loadDemoData(dataset: SeedDataset, reset = false): void {
     this.seeding.set(true);

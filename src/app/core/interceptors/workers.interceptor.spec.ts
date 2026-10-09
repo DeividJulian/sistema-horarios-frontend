@@ -28,22 +28,22 @@ describe('workersInterceptor', () => {
   });
 
   it('tells the other tabs when a block is moved', () => {
-    http.put('http://api/horarios/3', {}).subscribe();
-    backend.expectOne('http://api/horarios/3').flush({});
-    expect(tabSync.notifyChange).toHaveBeenCalledWith('PUT /horarios/3');
+    http.put('http://api/schedules/3', {}).subscribe();
+    backend.expectOne('http://api/schedules/3').flush({});
+    expect(tabSync.notifyChange).toHaveBeenCalledWith('PUT /schedules/3');
   });
 
   it('does not notify on failed writes or on writes that do not touch the schedule', () => {
-    http.put('http://api/horarios/3', {}).subscribe({ error: () => undefined });
-    backend.expectOne('http://api/horarios/3').flush({}, { status: 409, statusText: 'Conflict' });
-    http.post('http://api/aulas', {}).subscribe();
-    backend.expectOne('http://api/aulas').flush({});
+    http.put('http://api/schedules/3', {}).subscribe({ error: () => undefined });
+    backend.expectOne('http://api/schedules/3').flush({}, { status: 409, statusText: 'Conflict' });
+    http.post('http://api/classrooms', {}).subscribe();
+    backend.expectOne('http://api/classrooms').flush({});
     expect(tabSync.notifyChange).not.toHaveBeenCalled();
   });
 
   it('reports when a GET was answered from the Service Worker cache', () => {
-    http.get('http://api/horarios').subscribe();
-    backend.expectOne('http://api/horarios').flush([], { headers: { 'X-From-Cache': '1' } });
+    http.get('http://api/schedules').subscribe();
+    backend.expectOne('http://api/schedules').flush([], { headers: { 'X-From-Cache': '1' } });
     expect(connection.markDataFromCache).toHaveBeenCalledWith(true);
   });
 });

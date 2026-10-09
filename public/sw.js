@@ -1,11 +1,11 @@
 // Service Worker: lets the app open and show the last saved schedule without a connection.
 
-const VERSION = 'v3';
+const VERSION = 'v4';
 const APP_CACHE = `schedule-app-${VERSION}`;
 const API_CACHE = `schedule-api-${VERSION}`;
 
 // Backend routes that can be read offline (GET only)
-const API_ROUTES = ['/horarios', '/profesores', '/aulas', '/grupos', '/materias', '/disponibilidad', '/conflictos', '/estadisticas', '/diagnostico'];
+const API_ROUTES = ['/schedules', '/teachers', '/classrooms', '/groups', '/subjects', '/availability', '/conflicts', '/statistics', '/diagnostics'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
