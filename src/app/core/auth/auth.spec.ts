@@ -4,7 +4,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree, provideRouter } from '@angular/router';
 
 import { API_URL } from '../api/api-url';
-import { LoginResponse } from '../models';
+import { LoginResponse, Role } from '../models';
 import { adminGuard, authGuard, guestGuard } from './auth.guards';
 import { authInterceptor } from './auth.interceptor';
 import { AuthService, tokenExpiry } from './auth.service';
@@ -17,7 +17,7 @@ function fakeToken(expSeconds: number): string {
 
 const inOneHour = () => Math.floor(Date.now() / 1000) + 3600;
 
-function loginResponse(rol: 'admin' | 'usuario'): LoginResponse {
+function loginResponse(rol: Role): LoginResponse {
   return {
     access_token: fakeToken(inOneHour()),
     token_type: 'bearer',
