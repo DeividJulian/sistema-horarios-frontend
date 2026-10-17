@@ -36,7 +36,8 @@ export function loginErrorMessage(error: unknown): string {
   selector: 'app-login-page',
   imports: [ReactiveFormsModule],
   templateUrl: './login-page.html',
-  styleUrl: './login-page.css',
+  // Shared with the sign-up page (same "Cotizador IA" theme)
+  styleUrl: '../auth.css',
 })
 export class LoginPage {
   private readonly auth = inject(AuthService);

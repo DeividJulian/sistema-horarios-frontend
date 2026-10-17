@@ -1,6 +1,6 @@
 /*
- * "Cotizador IA" theme: dark with a teal accent. The variables are declared on :host so they only apply to the
- * login page; the rest of the app keeps its own palette even though some names are the same.
+ * "Cotizador IA" theme for the login and sign-up pages: dark with a teal accent. The variables are declared on :host so they only apply
+ * to these pages; the rest of the app keeps its own palette even though some names are the same.
  */
 :host {
   --bg: #0a1316;
