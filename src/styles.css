@@ -11,7 +11,7 @@
   --shadow-panel: 0 10px 30px rgba(2, 6, 23, 0.35);
   --danger: #fb7185;
   --success: #34d399;
-  --font-sans: 'Manrope', system-ui, sans-serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   color-scheme: dark;
 }
