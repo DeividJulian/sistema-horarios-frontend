@@ -51,18 +51,59 @@
   padding: 24px;
 }
 
-.card h2 {
-  margin: 0 0 4px;
-  font-size: 22px;
+/* ---------- Brand and heading ---------- */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
-.muted {
+.brand-mark {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 800;
+}
+
+.brand-name {
+  font-weight: 700;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* The app styles h1 with a gradient; the login uses plain text */
+h1 {
+  margin: 0 0 6px;
+  font-size: 30px;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--text);
+  background: none;
+  -webkit-text-fill-color: currentColor;
+}
+
+.lead {
+  margin: 0 0 6px;
   color: var(--muted);
+  font-size: 14px;
 }
 
-.card > .muted {
-  margin: 0 0 14px;
-  font-size: 14px;
+.profiles {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .footer {
