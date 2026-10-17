@@ -165,6 +165,21 @@
           (restoreRequested)="restoreClass($event)"
           (classroomChangeRequested)="changeClassroom($event)"
         />
+      } @else {
+        <aside class="inspector-empty" aria-label="Inspector">
+          <p class="inspector-eyebrow">Inspector</p>
+          <span class="inspector-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M8 3v3M16 3v3M4 9h16M5 5h14v15H5zM9 14h6" /></svg>
+          </span>
+          <p class="inspector-title">Selecciona una clase</p>
+          <p class="inspector-text">
+            @switch (auth.role()) {
+              @case ('admin') { Verás su aula, grupo y profesor, sus restricciones y podrás moverla, cancelarla o cambiarla de aula. }
+              @case ('profesor') { Podrás cancelarla en una fecha o cambiarla a un aula libre; tus estudiantes recibirán un aviso. }
+              @default { Verás su aula, grupo, jornada, profesor y si tiene cancelaciones. }
+            }
+          </p>
+        </aside>
       }
     </div>
   }

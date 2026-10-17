@@ -134,21 +134,81 @@
 }
 
 /* The calendar is centred; with the details open both share the row */
+/* Schedule canvas on the left, inspector (320 px) on the right */
 .calendar-layout {
   display: flex;
-  justify-content: center;
   gap: 16px;
   align-items: flex-start;
-  flex-wrap: wrap;
 }
 
 .calendar-layout app-schedule-grid {
-  flex: 1 1 640px;
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: 1080px;
 }
 
-.calendar-layout.with-details app-schedule-grid {
-  max-width: 860px;
+.inspector-empty {
+  flex: none;
+  width: 320px;
+  position: sticky;
+  top: 72px;
+  padding: 18px;
+  border-radius: var(--radius);
+  border: 1px dashed var(--border-strong);
+  background: var(--panel);
+  text-align: center;
+}
+
+.inspector-eyebrow {
+  margin: 0 0 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #71717a;
+}
+
+.inspector-icon {
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 10px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: var(--accent);
+  background: var(--pastel-violet);
+}
+
+.inspector-icon svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.inspector-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.inspector-text {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Below 1280 px the calendar uses the full width; the inspector appears under it when a class is chosen */
+@media (max-width: 1280px) {
+  .calendar-layout {
+    flex-wrap: wrap;
+  }
+
+  .inspector-empty {
+    display: none;
+  }
 }
 
