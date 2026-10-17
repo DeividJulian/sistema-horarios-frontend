@@ -1,5 +1,5 @@
 <div class="grid-scroll">
-  <section class="board" cdkDropListGroup aria-label="Calendario semanal">
+  <section class="board" cdkDropListGroup aria-label="Calendario semanal" [class.busy]="busy()" [attr.aria-busy]="busy()">
     <div class="row header-row">
       <div class="hour-cell"></div>
       @for (column of days(); track column.day) {

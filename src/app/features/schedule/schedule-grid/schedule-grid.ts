@@ -55,6 +55,8 @@ export class ScheduleGrid {
   readonly cancelledKeys = input<Set<string>>(new Set());
   /** Only the hours that have classes (for people who cannot drag blocks to empty hours). */
   readonly trimEmptyHours = input(false);
+  /** The schedule is being generated: the cards shimmer instead of a spinner. */
+  readonly busy = input(false);
 
   protected readonly todayIso = toIsoDate(new Date());
   protected readonly shortDate = formatShortDate;

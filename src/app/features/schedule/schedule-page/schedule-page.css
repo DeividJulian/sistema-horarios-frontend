@@ -134,6 +134,42 @@
 }
 
 /* The calendar is centred; with the details open both share the row */
+/* ---------- Loading skeleton ---------- */
+.calendar-skeleton {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--panel);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.skeleton-head,
+.skeleton-row {
+  display: grid;
+  grid-template-columns: 70px repeat(5, 1fr);
+  gap: 8px;
+}
+
+.skeleton-head .skeleton {
+  height: 28px;
+}
+
+.skeleton-row .skeleton {
+  height: 42px;
+}
+
+.skeleton-row .skeleton.hour {
+  height: 14px;
+  align-self: center;
+}
+
+.skeleton-row .skeleton.empty {
+  opacity: 0.35;
+}
+
 /* Schedule canvas on the left, inspector (320 px) on the right */
 .calendar-layout {
   display: flex;

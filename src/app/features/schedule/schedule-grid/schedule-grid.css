@@ -190,8 +190,34 @@
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
 }
 
+/* While the schedule is generated the cards shimmer softly */
+.board.busy .block {
+  pointer-events: none;
+  background: linear-gradient(90deg, #18181b 0%, #26262c 40%, #18181b 80%);
+  background-size: 200% 100%;
+  border-color: var(--border);
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.board.busy .block > * {
+  opacity: 0.25;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .block {
     transition: none;
+  }
+
+  .board.busy .block {
+    animation: none;
   }
 }
