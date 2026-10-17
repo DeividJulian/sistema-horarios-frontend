@@ -22,7 +22,11 @@
   margin: 0;
   font-size: 15px;
   font-weight: 600;
-  text-transform: capitalize;
+}
+
+/* «lunes 19 de octubre» → «Lunes 19 de octubre» (only the first letter) */
+.agenda-head h3::first-letter {
+  text-transform: uppercase;
 }
 
 .count,
