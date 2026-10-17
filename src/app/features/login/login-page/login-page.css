@@ -313,6 +313,32 @@ h1 {
   color: var(--warn);
 }
 
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.messages:empty {
+  display: none;
+}
+
+/* Small phones (360 px): a bit less padding so the fields keep their width */
+@media (max-width: 420px) {
+  .auth-page {
+    justify-content: flex-start;
+    padding: 20px 12px;
+  }
+
+  .card {
+    padding: 20px 16px;
+  }
+
+  h1 {
+    font-size: 26px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .server.waking .dot,
   .spinner {

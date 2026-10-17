@@ -73,11 +73,7 @@
         }
       </div>
 
-      @if (error(); as msg) {
-        <p class="alert" role="alert">{{ msg }}</p>
-      }
-
-      <button type="submit" class="btn-primary submit" [disabled]="submitting()">
+      <button type="submit" class="btn-primary submit" [disabled]="submitting()" [attr.aria-busy]="submitting()">
         @if (submitting()) {
           <span class="spinner" aria-hidden="true"></span> Ingresando…
         } @else {
@@ -85,9 +81,15 @@
         }
       </button>
 
-      @if (slow()) {
-        <p class="slow" role="status">El servidor está despertando, puede tardar hasta un minuto. No cierres la página.</p>
-      }
+      <!-- Always in the page, so screen readers announce what appears inside -->
+      <div class="messages" aria-live="polite">
+        @if (error(); as msg) {
+          <p class="alert">{{ msg }}</p>
+        }
+        @if (slow()) {
+          <p class="slow">El servidor está despertando, puede tardar hasta un minuto. No cierres la página.</p>
+        }
+      </div>
     </form>
   </div>
   <p class="footer">Universidad Cooperativa de Colombia · Programación Orientada a la Web</p>
