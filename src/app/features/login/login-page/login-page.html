@@ -52,6 +52,7 @@
           <button
             type="button"
             class="toggle"
+            [disabled]="submitting()"
             (click)="showPassword.set(!showPassword())"
             [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
             [attr.aria-pressed]="showPassword()"
@@ -78,16 +79,14 @@
 
       <button type="submit" class="btn-primary submit" [disabled]="submitting()">
         @if (submitting()) {
-          <span class="spinner" aria-hidden="true"></span> Entrando…
+          <span class="spinner" aria-hidden="true"></span> Ingresando…
         } @else {
-          Entrar
+          Ingresar
         }
       </button>
 
       @if (slow()) {
-        <p class="slow" role="status">
-          El servidor gratuito se está despertando después de un rato sin uso. La primera vez puede tardar hasta un minuto; no cierres la página.
-        </p>
+        <p class="slow" role="status">El servidor está despertando, puede tardar hasta un minuto. No cierres la página.</p>
       }
     </form>
   </div>

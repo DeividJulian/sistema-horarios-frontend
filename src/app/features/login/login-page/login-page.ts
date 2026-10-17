@@ -13,6 +13,25 @@ type LoginField = 'email' | 'password';
 /** After this long without an answer, explain that the free server is waking up. */
 const SLOW_MS = 4000;
 
+/** Clear Spanish message for each way the login can fail. */
+export function loginErrorMessage(error: unknown): string {
+  if (error instanceof HttpErrorResponse) {
+    if (error.status === 0) {
+      return 'No hay conexión con el servidor. Revisa tu internet o intenta de nuevo en un minuto.';
+    }
+    if (error.status === 401) {
+      return apiErrorMessage(error, 'Correo o contraseña incorrectos.');
+    }
+    if (error.status === 403) {
+      return apiErrorMessage(error, 'Tu cuenta no tiene acceso. Habla con el administrador.');
+    }
+    if (error.status === 502 || error.status === 503 || error.status === 504) {
+      return 'El servidor está despertando. Espera unos segundos e intenta de nuevo.';
+    }
+  }
+  return apiErrorMessage(error, 'No se pudo iniciar sesión. Intenta de nuevo.');
+}
+
 @Component({
   selector: 'app-login-page',
   imports: [ReactiveFormsModule],
@@ -56,6 +75,7 @@ export class LoginPage {
   }
 
   protected submit(): void {
+    if (this.submitting()) return; // no double submission while waiting for the answer
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -63,6 +83,7 @@ export class LoginPage {
     const { email, password } = this.form.getRawValue();
     this.submitting.set(true);
     this.error.set(null);
+    this.form.disable({ emitEvent: false }); // nothing can be edited while the request is on its way
     const slowTimer = setTimeout(() => this.slow.set(true), SLOW_MS);
 
     this.auth
@@ -72,6 +93,7 @@ export class LoginPage {
           clearTimeout(slowTimer);
           this.submitting.set(false);
           this.slow.set(false);
+          this.form.enable({ emitEvent: false });
         }),
       )
       .subscribe({
@@ -82,7 +104,7 @@ export class LoginPage {
         },
         error: (err: unknown) => {
           if (err instanceof HttpErrorResponse && err.status === 0) this.server.set('down');
-          this.error.set(apiErrorMessage(err, 'No se pudo iniciar sesión.'));
+          this.error.set(loginErrorMessage(err));
         },
       });
   }
