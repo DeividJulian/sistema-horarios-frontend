@@ -379,3 +379,33 @@ app-availability-panel {
   font-family: var(--font-mono);
   color: var(--text);
 }
+
+/* ---------- Loading skeletons (shimmer instead of a spinner) ---------- */
+.skeleton {
+  display: block;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #18181b 0%, #232328 40%, #18181b 80%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeleton-badge {
+  width: 84px;
+  height: 18px;
+  border-radius: 999px;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}

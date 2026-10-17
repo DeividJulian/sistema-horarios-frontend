@@ -1,6 +1,6 @@
 .toasts {
   position: fixed;
-  top: 76px; /* below the sticky nav bar, so the Tutorial button stays clickable */
+  top: 68px; /* below the top bar, so its buttons stay clickable */
   right: 16px;
   display: flex;
   flex-direction: column;
