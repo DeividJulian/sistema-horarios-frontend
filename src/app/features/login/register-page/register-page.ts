@@ -84,12 +84,17 @@ export class RegisterPage {
   protected chooseType(type: AccountType): void {
     this.type.set(type);
     this.form.controls.tipo.setValue(type);
+    this.applyType();
+    this.error.set(null); // a new choice starts without the previous error
+  }
+
+  /** Enables name and group for students and disables them for teachers (without touching the error message). */
+  private applyType(): void {
     for (const field of ['nombre', 'grupo_id'] as const) {
       const control = this.form.controls[field];
-      if (type === 'estudiante') control.enable();
+      if (this.type() === 'estudiante') control.enable();
       else control.disable();
     }
-    this.error.set(null);
   }
 
   /** Message under a field, only once the person has left it (or tried to submit). */
@@ -141,7 +146,7 @@ export class RegisterPage {
           this.submitting.set(false);
           this.slow.set(false);
           this.form.enable({ emitEvent: false });
-          this.chooseType(this.type()); // keeps name and group disabled for teachers
+          this.applyType(); // keeps name and group disabled for teachers; the error stays visible
         }),
       )
       .subscribe({
