@@ -6,7 +6,8 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../core/http/api-error';
-import { RegisterGroup, shiftText } from '../../../core/models';
+import { ROLE_LABELS, RegisterGroup, shiftText } from '../../../core/models';
+import { NotificationService } from '../../../core/services/notification.service';
 import { trimmedLength } from '../../../shared/forms/validators';
 
 type AccountType = 'estudiante' | 'profesor';
@@ -41,6 +42,7 @@ export function registerErrorMessage(error: unknown): string {
 export class RegisterPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notify = inject(NotificationService);
 
   protected readonly form = inject(NonNullableFormBuilder).group(
     {
@@ -143,7 +145,11 @@ export class RegisterPage {
         }),
       )
       .subscribe({
-        next: () => this.router.navigateByUrl('/horario'),
+        next: ({ usuario }) => {
+          const what = usuario.rol === 'profesor' ? 'Cuenta de profesor activada' : 'Cuenta creada';
+          this.notify.success(`${what}. Bienvenido, ${usuario.nombre}: entraste como ${ROLE_LABELS[usuario.rol]}.`);
+          this.router.navigateByUrl('/horario');
+        },
         error: (err: unknown) => this.error.set(registerErrorMessage(err)),
       });
   }

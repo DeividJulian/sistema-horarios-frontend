@@ -6,6 +6,8 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../core/http/api-error';
+import { ROLE_LABELS } from '../../../core/models';
+import { NotificationService } from '../../../core/services/notification.service';
 
 type ServerState = 'waking' | 'ready' | 'down';
 type LoginField = 'email' | 'password';
@@ -42,6 +44,7 @@ export function loginErrorMessage(error: unknown): string {
 export class LoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly notify = inject(NotificationService);
 
   /** Page to return to after signing in (?volver=/analisis). */
   readonly volver = input<string>();
@@ -98,8 +101,10 @@ export class LoginPage {
         }),
       )
       .subscribe({
-        next: () => {
+        next: ({ usuario }) => {
           this.server.set('ready');
+          // Says who signed in and with which role
+          this.notify.success(`Bienvenido, ${usuario.nombre}. Entraste como ${ROLE_LABELS[usuario.rol]}.`);
           const target = this.volver();
           this.router.navigateByUrl(target && target.startsWith('/') && !target.startsWith('/login') ? target : '/horario');
         },
