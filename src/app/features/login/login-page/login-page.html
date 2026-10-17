@@ -20,29 +20,34 @@
     </p>
 
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form">
-      <label class="field">
-        <span class="field-label">Correo</span>
+      <div class="field">
+        <label class="field-label" for="login-email">Correo</label>
         <input
+          id="login-email"
           formControlName="email"
           type="email"
           autocomplete="username"
+          inputmode="email"
           placeholder="nombre@ucc.edu.co"
-          [attr.aria-invalid]="!!errorMessage(form.controls.email, 'El correo')"
+          [attr.aria-invalid]="!!fieldError('email')"
+          [attr.aria-describedby]="fieldError('email') ? 'login-email-error' : null"
         />
-        @if (errorMessage(form.controls.email, 'El correo'); as msg) {
-          <span class="field-error">{{ msg }}</span>
+        @if (fieldError('email'); as msg) {
+          <span class="field-error" id="login-email-error">{{ msg }}</span>
         }
-      </label>
+      </div>
 
-      <label class="field">
-        <span class="field-label">Contraseña</span>
+      <div class="field">
+        <label class="field-label" for="login-password">Contraseña</label>
         <span class="password">
           <input
+            id="login-password"
             formControlName="password"
             [type]="showPassword() ? 'text' : 'password'"
             autocomplete="current-password"
             placeholder="••••••••"
-            [attr.aria-invalid]="!!errorMessage(form.controls.password, 'La contraseña')"
+            [attr.aria-invalid]="!!fieldError('password')"
+            [attr.aria-describedby]="fieldError('password') ? 'login-password-error' : null"
           />
           <button
             type="button"
@@ -54,10 +59,10 @@
             {{ showPassword() ? 'Ocultar' : 'Ver' }}
           </button>
         </span>
-        @if (errorMessage(form.controls.password, 'La contraseña'); as msg) {
-          <span class="field-error">{{ msg }}</span>
+        @if (fieldError('password'); as msg) {
+          <span class="field-error" id="login-password-error">{{ msg }}</span>
         }
-      </label>
+      </div>
 
       @if (error(); as msg) {
         <p class="alert" role="alert">{{ msg }}</p>

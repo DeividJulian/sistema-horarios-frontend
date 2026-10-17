@@ -6,9 +6,9 @@ import { finalize } from 'rxjs';
 
 import { AuthService } from '../../../core/auth/auth.service';
 import { apiErrorMessage } from '../../../core/http/api-error';
-import { errorMessage } from '../../../shared/forms/error-message';
 
 type ServerState = 'waking' | 'ready' | 'down';
+type LoginField = 'email' | 'password';
 
 /** After this long without an answer, explain that the free server is waking up. */
 const SLOW_MS = 4000;
@@ -31,7 +31,6 @@ export class LoginPage {
     password: ['', Validators.required],
   });
 
-  protected readonly errorMessage = errorMessage;
   protected readonly submitting = signal(false);
   protected readonly slow = signal(false);
   protected readonly error = signal<string | null>(null);
@@ -45,6 +44,15 @@ export class LoginPage {
       error: () => this.server.set('down'),
     });
     inject(DestroyRef).onDestroy(() => ping.unsubscribe());
+  }
+
+  /** Message under a field, only once the person has left it (or tried to submit). */
+  protected fieldError(field: LoginField): string | null {
+    const control = this.form.controls[field];
+    if (!control.touched || control.valid) return null;
+    if (control.hasError('required')) return field === 'email' ? 'Escribe tu correo.' : 'Escribe tu contraseña.';
+    if (control.hasError('email')) return 'Escribe un correo válido, por ejemplo nombre@ucc.edu.co.';
+    return null;
   }
 
   protected submit(): void {
