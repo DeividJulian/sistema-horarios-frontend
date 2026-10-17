@@ -72,6 +72,16 @@ describe('authentication', () => {
     expect(localStorage.getItem('horarios.sesion')).toContain('Ana Pérez');
   });
 
+  it('signs in right after signing up', () => {
+    auth.register({ rol: 'estudiante', nombre: 'Ana Pérez', email: 'ana@ucc.edu.co', password: 'segura123', grupo_id: 3 }).subscribe();
+    const request = backend.expectOne(`${API_URL}/auth/register`);
+    expect(request.request.body.grupo_id).toBe(3);
+    expect(request.request.headers.has('Authorization')).toBe(false);
+    request.flush({ ...loginResponse('estudiante'), usuario: { id: 7, nombre: 'Ana Pérez', email: 'ana@ucc.edu.co', rol: 'estudiante', grupo_id: 3 } });
+    expect(auth.isStudent()).toBe(true);
+    expect(auth.user()?.grupo_id).toBe(3);
+  });
+
   it('sends the token to the API but not on the login request itself', () => {
     signIn('usuario');
     http.get(`${API_URL}/teachers`).subscribe();
