@@ -11,10 +11,11 @@
   margin-bottom: 4px;
 }
 
-h1 {
+.greeting {
   margin: 0;
-  font-size: clamp(24px, 2.2vw, 30px);
-  font-weight: 800;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .lead {
@@ -31,78 +32,6 @@ h1 {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-}
-
-/* ---------- Summary cards ---------- */
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.kpi {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: auto auto;
-  column-gap: 12px;
-  align-items: center;
-  padding: 11px 14px;
-  border-radius: 12px;
-  background: linear-gradient(160deg, rgba(24, 33, 58, 0.9), rgba(18, 26, 46, 0.9));
-  border: 1px solid var(--border);
-  box-shadow: var(--shadow-panel);
-  overflow: hidden;
-  transition: transform 0.2s, border-color 0.2s;
-}
-
-/* Thin coloured line on top of each card */
-.kpi::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 3px;
-  background: var(--kpi-color);
-  opacity: 0.85;
-}
-
-.kpi:hover {
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--kpi-color) 50%, var(--border));
-}
-
-.kpi-icon {
-  grid-row: span 2;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  display: grid;
-  place-items: center;
-  background: color-mix(in srgb, var(--kpi-color) 14%, transparent);
-}
-
-.kpi-icon svg {
-  width: 19px;
-  height: 19px;
-  fill: none;
-  stroke: var(--kpi-color);
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.kpi-value {
-  font-size: 21px;
-  font-weight: 800;
-  font-family: var(--font-mono);
-  line-height: 1.1;
-}
-
-.kpi-label {
-  font-size: 11.5px;
-  font-weight: 700;
-  color: var(--text-muted);
 }
 
 /* ---------- New notices (teachers and students) ---------- */
@@ -223,8 +152,3 @@ h1 {
   max-width: 860px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .kpi {
-    transition: none;
-  }
-}

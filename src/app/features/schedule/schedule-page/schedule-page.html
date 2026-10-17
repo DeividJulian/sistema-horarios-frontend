@@ -7,7 +7,7 @@
         @default { Panel de programación académica }
       }
     </p>
-    <h1>Hola, {{ firstName() }}</h1>
+    <h2 class="greeting">Hola, {{ firstName() }}</h2>
     <p class="muted lead">
       @switch (auth.role()) {
         @case ('admin') {
@@ -29,31 +29,14 @@
       }
     </p>
   </div>
-  @if (seesEverything()) {
-    <div class="actions">
-      <button type="button" class="btn-secondary" (click)="analyze()" [disabled]="!store.loaded()">Analizar horario</button>
-      @if (auth.isAdmin()) {
-        <button type="button" class="btn-primary" (click)="generate()" [disabled]="store.generating() || !store.loaded()">
-          {{ store.generating() ? 'Generando…' : 'Generar horario automáticamente' }}
-        </button>
-      }
-    </div>
-  }
 </header>
 
-@if (store.loaded()) {
-  <section class="kpis" aria-label="Resumen">
-    @for (k of kpis(); track k.label) {
-      <div class="kpi" [style.--kpi-color]="k.color">
-        <span class="kpi-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24"><path [attr.d]="k.icon" /></svg>
-        </span>
-        <span class="kpi-value">{{ k.value }}</span>
-        <span class="kpi-label">{{ k.label }}</span>
-      </div>
-    }
-  </section>
-}
+<app-bento-overview
+  [entries]="visibleEntries()"
+  [cancelled]="cancelledThisWeek()"
+  [ready]="store.loaded()"
+  (analyze)="analyze()"
+/>
 
 @if (auth.role() === 'usuario') {
   <p class="readonly-note" role="note">
