@@ -77,20 +77,6 @@
         </p>
       }
     </form>
-
-    @if (demoAccounts().length) {
-      <div class="demo">
-        <p class="demo-title">Prueba cada rol</p>
-        <div class="demo-buttons">
-          @for (account of demoAccounts(); track account.email) {
-            <button type="button" class="demo-account" (click)="useAccount(account)">
-              <strong>{{ account.etiqueta }}</strong>
-              <span>{{ account.descripcion }}</span>
-            </button>
-          }
-        </div>
-      </div>
-    }
   </div>
   <p class="footer">Universidad Cooperativa de Colombia · Programación Orientada a la Web</p>
 </section>

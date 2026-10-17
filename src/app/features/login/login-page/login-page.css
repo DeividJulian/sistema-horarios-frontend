@@ -302,52 +302,6 @@ h1 {
   color: var(--warn);
 }
 
-/* ---------- Test accounts ---------- */
-.demo {
-  margin-top: 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--border);
-}
-
-.demo-title {
-  margin: 0 0 8px;
-  font-family: var(--mono);
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-}
-
-.demo-buttons {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-
-.demo-account {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 8px 10px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-2);
-  color: var(--text);
-  font: inherit;
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.demo-account span {
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.demo-account:hover {
-  border-color: var(--accent);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .server.waking .dot,
   .spinner {
