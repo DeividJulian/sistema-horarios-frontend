@@ -96,6 +96,11 @@ export class SchedulePage {
     return `Próximos días de clase: del ${formatLongDate(days[0].date)} al ${formatLongDate(days[days.length - 1].date)}`;
   });
 
+  /** Reason of each cancellation, shown when hovering the cancelled card. */
+  protected readonly cancelReasons = computed(
+    () => new Map(this.notices.cancellations().map((c) => [`${c.horario_id}|${c.fecha}`, c.motivo])),
+  );
+
   protected readonly cancelledKeys = computed(
     () => new Set(this.notices.cancellations().map((c) => `${c.horario_id}|${c.fecha}`)),
   );

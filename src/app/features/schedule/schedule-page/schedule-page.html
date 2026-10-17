@@ -152,6 +152,7 @@
         [conflicts]="conflictsByEntry()"
         [days]="days()"
         [cancelledKeys]="cancelledKeys()"
+        [cancelReasons]="cancelReasons()"
         [trimEmptyHours]="!auth.isAdmin()"
         [busy]="store.generating()"
         (moved)="move($event)"
