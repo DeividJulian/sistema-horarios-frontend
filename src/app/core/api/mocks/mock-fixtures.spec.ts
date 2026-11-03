@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import * as z from 'zod/mini';
 
 import * as schemas from '../generated/zod.gen';
 import * as fixtures from './fixtures';
@@ -6,7 +6,7 @@ import * as fixtures from './fixtures';
 // The mocks are typed with the contract at compile time; here every one is also parsed with the Zod schema
 // generated from the same contract, so they can never drift from what the real API sends.
 describe('mock fixtures follow the API contract', () => {
-  const cases: [string, unknown, z.ZodType][] = [
+  const cases: [string, unknown, z.ZodMiniType][] = [
     ['MOCK_ADMIN', fixtures.MOCK_ADMIN, schemas.zUserOut],
     ['MOCK_TEACHERS', fixtures.MOCK_TEACHERS, z.array(schemas.zTeacherOut)],
     ['MOCK_CLASSROOMS', fixtures.MOCK_CLASSROOMS, z.array(schemas.zClassroomOut)],

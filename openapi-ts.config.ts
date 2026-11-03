@@ -7,7 +7,8 @@ export default defineConfig({
   output: { path: './src/app/core/api/generated' },
   plugins: [
     '@hey-api/typescript',
-    // The backend sends timestamps with their offset (2026-10-21T21:04:05+00:00)
-    { name: 'zod', dates: { offset: true } },
+    // Zod Mini: tree-shakable (the classic build added ~430 kB to the initial bundle).
+    // The backend sends timestamps with their offset (2026-10-21T21:04:05+00:00).
+    { name: 'zod', compatibilityVersion: 'mini', dates: { offset: true } },
   ],
 });

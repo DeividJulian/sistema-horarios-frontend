@@ -1,5 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import * as z from 'zod/mini';
 
 import { AnalysisService } from '../api/analysis.service';
 import { AuthService } from '../auth/auth.service';
@@ -14,6 +15,8 @@ const LAST_RUN_KEY = 'horarios.ultima-optimizacion';
 export type ScheduleStatus = 'optimizado' | 'con-conflictos' | 'incompleto' | 'sin-horario';
 
 /** Last optimization run in this browser: when, and the idle hours before and after the simulated annealing. */
+const zLastRun = z.object({ fecha: z.string(), antes: z.optional(z.number()), despues: z.optional(z.number()) });
+
 export interface LastRun {
   fecha: string;
   antes?: number;
@@ -152,7 +155,9 @@ export class OptimizationStore {
       const raw = localStorage.getItem(LAST_RUN_KEY);
       if (!raw) return null;
       // Older versions stored only the date
-      return raw.startsWith('{') ? (JSON.parse(raw) as LastRun) : { fecha: raw };
+      if (!raw.startsWith('{')) return { fecha: raw };
+      const parsed = zLastRun.safeParse(JSON.parse(raw));
+      return parsed.success ? parsed.data : null;
     } catch {
       return null;
     }
