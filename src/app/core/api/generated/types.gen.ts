@@ -641,7 +641,7 @@ export type ReadinessProblem = {
     /**
      * Profesor Id
      */
-    profesor_id?: number | null;
+    profesor_id: number | null;
     /**
      * Seccion
      */

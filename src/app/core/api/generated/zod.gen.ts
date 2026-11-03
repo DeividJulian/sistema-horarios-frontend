@@ -339,7 +339,7 @@ export const zGenerationOut = z.object({
  */
 export const zReadinessProblem = z.object({
     mensaje: z.string(),
-    profesor_id: z.int().nullish(),
+    profesor_id: z.int().nullable(),
     seccion: z.enum([
         'aulas',
         'grupos',
