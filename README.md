@@ -154,6 +154,19 @@ Los campos que el contrato no conoce se descartan. Se parsean las **47** llamada
 
 Se usa **Zod Mini** con imports `import * as z`, que se puede podar (*tree-shaking*): el bundle inicial pasó de 360 kB a 393 kB. Con el Zod clásico y `import { z }` llegaba a 794 kB por las traducciones de decenas de idiomas.
 
+## gRPC desde el navegador (Connect + Protobuf)
+
+El backend expone el servicio RPC de `proto/horarios/v1/horarios.proto` en `/rpc` (ver el README del backend).
+- **Contrato:** `proto/` es una copia de ese archivo.
+- **Cliente:** `npm run gen:proto` genera `src/app/core/rpc/gen` con `protoc-gen-es` (vía `buf`), y `npm run check:proto`, incluido en `npm test`, verifica que esté al día.
+- **Transporte:** el cliente (`core/rpc/schedule-rpc.service.ts`) usa `@connectrpc/connect-web` con Protobuf binario, que funciona sobre HTTP/1.1 y admite *streaming* del servidor.
+- **Sesión:** envía el mismo JWT que REST.
+- **Carga diferida:** se carga solo al usarlo, así que el bundle inicial no crece.
+
+En la app:
+- **Panel → tarjeta Optimización → interruptor «REST · JSON / gRPC · streaming»** (administrador). Con gRPC se ven en vivo las fases (Preparar, CSP, Recocido, Guardar), la barra de materias asignadas y las horas muertas, más el botón **Cancelar**. El servidor se detiene antes de guardar, así que el horario anterior se conserva.
+- **Análisis → «REST (JSON) vs gRPC (Protobuf)»:** mide en el navegador, contra el servidor real, el tamaño del mensaje, el tamaño con gzip y la mediana de tiempo de `GET /schedules` frente a `ListSchedule`. Con la facultad de prueba (130 bloques): 14.013 B de JSON frente a 1.823 B de Protobuf, es decir, 7,7× menos.
+
 ## Tecnologías
 
 - Angular 22 con componentes standalone, **signals** y detección de cambios sin Zone.js
