@@ -48,6 +48,8 @@
   --f-display: 'Schibsted Grotesk', 'Segoe UI', system-ui, sans-serif;
   --f-body: 'Atkinson Hyperlegible Next', 'Segoe UI', system-ui, sans-serif;
   --f-mono: 'Atkinson Hyperlegible Mono', ui-monospace, Consolas, monospace;
+  /* Times and counts: the display face with tabular figures (Atkinson's slashed zero reads as a strike-through) */
+  --f-num: 'Schibsted Grotesk', 'Segoe UI', system-ui, sans-serif;
   /* Scale (≈1.2): 12 · 13.5 · 14.5 · 17 · 20 · 25 · 32 */
   --t-xs: 12px;
   --t-sm: 13.5px;

@@ -189,6 +189,7 @@ svg {
 }
 
 .agenda-time {
+  font-family: var(--f-num);
   display: flex;
   flex-direction: column;
   font-size: var(--t-sm);
