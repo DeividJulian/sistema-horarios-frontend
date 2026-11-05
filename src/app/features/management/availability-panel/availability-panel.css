@@ -148,7 +148,7 @@ h2 {
 .cell.on {
   background: var(--accent);
   border-color: var(--accent);
-  background-image: repeating-linear-gradient(135deg, transparent 0 6px, rgba(4, 32, 28, 0.14) 6px 8px);
+  background-image: repeating-linear-gradient(135deg, transparent 0 6px, color-mix(in srgb, var(--accent-ink) 14%, transparent) 6px 8px);
 }
 
 /* Hours inside the shift of the teacher's groups */

@@ -52,7 +52,7 @@ export function initialsOf(name: string): string {
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './nav-bar.html',
   styleUrl: './nav-bar.css',
-  host: { '[class.open]': 'layout.sidebarOpen()' },
+  host: { '[class.open]': 'layout.sidebarOpen()', '(document:keydown.escape)': 'layout.closeSidebar()' },
 })
 export class NavBar {
   protected readonly auth = inject(AuthService);

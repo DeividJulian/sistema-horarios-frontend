@@ -194,7 +194,6 @@ svg {
   flex-direction: column;
   font-size: var(--t-sm);
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   line-height: 1.25;
 }
 
@@ -465,6 +464,22 @@ svg {
   border-right: 0;
 }
 
+@media (max-width: 680px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat {
+    padding-left: 4px;
+    border-right: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+}
+
 .stat-icon {
   grid-row: 1 / span 2;
   width: 20px;
@@ -478,7 +493,6 @@ svg {
   font-weight: 800;
   letter-spacing: -0.03em;
   line-height: 1.05;
-  font-variant-numeric: tabular-nums;
 }
 
 .stat-label {

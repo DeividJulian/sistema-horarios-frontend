@@ -345,13 +345,18 @@ ul a.active .icon {
 }
 
 @media (max-width: 900px) {
+  /* Closed drawer: off screen and out of the tab order */
   :host {
     transform: translateX(-100%);
     box-shadow: none;
+    visibility: hidden;
+    transition: transform 0.22s var(--ease), visibility 0s linear 0.22s;
   }
 
   :host(.open) {
     transform: none;
     box-shadow: var(--sh-2);
+    visibility: visible;
+    transition: transform 0.22s var(--ease);
   }
 }

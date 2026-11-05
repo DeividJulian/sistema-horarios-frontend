@@ -41,7 +41,6 @@
   justify-content: flex-end;
   align-items: flex-start;
   font-size: var(--t-xs);
-  font-variant-numeric: tabular-nums;
   color: var(--faint);
   white-space: nowrap;
   transform: translateY(-8px);
@@ -88,7 +87,6 @@
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
 
 .day-meta {
@@ -184,7 +182,6 @@
   top: -10px;
   font-size: 11px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   background: var(--accent);
   color: var(--accent-ink);
   padding: 1px 7px;
@@ -246,7 +243,6 @@
   font-family: var(--f-num);
   font-size: 11px;
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 
@@ -447,7 +443,6 @@
   font-size: var(--t-xs);
   color: var(--accent);
   font-weight: 700;
-  font-variant-numeric: tabular-nums;
 }
 
 .tip dl {
@@ -580,8 +575,7 @@
     padding-top: 12px;
     text-align: right;
     font-size: var(--t-xs);
-    font-variant-numeric: tabular-nums;
-    color: var(--faint);
+      color: var(--faint);
     white-space: nowrap;
   }
 

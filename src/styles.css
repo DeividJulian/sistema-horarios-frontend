@@ -13,7 +13,7 @@
   --border-strong: #335058;
   --text: #e6ebf5;
   --muted: #94a3c0;
-  --faint: #7d8ba6; /* labels and placeholders · 5.3:1 on --bg */
+  --faint: #8794ae; /* labels and placeholders · ≥4.5:1 up to --surface-2 */
   --accent: #2dd4bf;
   --accent-hover: #5eead4;
   --accent-ink: #04201c;
