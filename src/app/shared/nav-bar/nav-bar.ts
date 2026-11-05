@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 
 import { AuthService } from '../../core/auth/auth.service';
-import { Role } from '../../core/models';
+import { ROLE_LABELS, Role } from '../../core/models';
 import { LayoutService } from '../../core/services/layout.service';
 import { NoticeStore } from '../../core/state/notice.store';
 import { OptimizationStore, ScheduleStatus } from '../../core/state/optimization.store';
@@ -36,6 +36,16 @@ const STATUS_LABELS: Record<ScheduleStatus, string> = {
   'sin-horario': 'Sin horario',
 };
 
+/** "Ana María López" → "AM"; words that do not start with a letter are skipped. */
+export function initialsOf(name: string): string {
+  return name
+    .split(/\s+/)
+    .filter((word) => /^\p{L}/u.test(word))
+    .slice(0, 2)
+    .map((word) => word[0].toUpperCase())
+    .join('');
+}
+
 /** Left sidebar: views, data management (administrators) and the health of the schedule. */
 @Component({
   selector: 'app-nav-bar',
@@ -50,6 +60,15 @@ export class NavBar {
   protected readonly optimization = inject(OptimizationStore);
   protected readonly layout = inject(LayoutService);
   protected readonly statusLabels = STATUS_LABELS;
+  protected readonly roleLabels = ROLE_LABELS;
+
+  /** Up to two initials, skipping words that do not start with a letter ("(mock)"). */
+  protected readonly initials = computed(() => initialsOf(this.auth.user()?.nombre ?? ''));
+
+  protected logout(): void {
+    this.layout.closeSidebar();
+    this.auth.logout();
+  }
 
   protected readonly views = computed<NavItem[]>(() => {
     const role = this.auth.role();
