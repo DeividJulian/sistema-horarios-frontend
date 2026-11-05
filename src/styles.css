@@ -179,9 +179,9 @@ a {
 }
 
 /* ---------- Text ---------- */
+/* Numbers and short figures: the display face (no slashed zero) */
 .mono {
-  font-family: var(--f-mono);
-  font-variant-numeric: tabular-nums;
+  font-family: var(--f-num);
 }
 
 .display {

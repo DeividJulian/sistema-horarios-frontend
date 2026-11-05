@@ -346,9 +346,9 @@
   border: 1px solid var(--bad);
   border-left: 3px solid var(--bad);
   background:
-    repeating-linear-gradient(135deg, transparent 0 8px, rgba(248, 113, 113, 0.1) 8px 16px),
+    repeating-linear-gradient(135deg, transparent 0 8px, color-mix(in srgb, var(--bad) 10%, transparent) 8px 16px),
     var(--bad-soft);
-  box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.12);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--bad) 12%, transparent);
 }
 
 .block.has-conflict .ev-time {
