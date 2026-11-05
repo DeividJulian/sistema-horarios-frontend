@@ -652,6 +652,32 @@ select option {
   height: 15px;
 }
 
+.data-table td:first-child {
+  font-weight: 700;
+  min-width: 150px;
+}
+
+/* A narrow table keeps only the icons of the row actions (each button keeps its aria-label) */
+.table-scroll {
+  container-type: inline-size;
+}
+
+@container (max-width: 820px) {
+  .row-actions button:has(svg) {
+    width: 34px;
+    padding: 0;
+  }
+
+  .row-actions button:has(svg) > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
 /* Search and filters above a list */
 .list-toolbar {
   display: flex;
